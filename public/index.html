@@ -121,6 +121,7 @@ button:hover{filter:brightness(1.12)}
 button.primary{background:var(--green);color:#001a0c;border:0}
 button.yellow{background:#211900;color:var(--yellow);border-color:var(--yellow)}
 button.danger{background:#2a0008;color:#ffb8c7;border-color:var(--red)}
+button.small{width:auto;padding:7px 10px;font-size:11px;margin-right:6px}
 
 .brand{
   display:flex;
@@ -452,6 +453,13 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
     </div>
 
     <div class="card">
+      <h2>Auto Paper Rules</h2>
+      <div id="autoRulesBox" class="note">
+        Rules loading...
+      </div>
+    </div>
+
+    <div class="card">
       <h2>Auto Paper Decision</h2>
       <div id="autoDecisionBox" class="note">
         Waiting for scan. This will show why the paper trader entered or did not enter.
@@ -478,7 +486,8 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
 
       <button id="scanPaperBtn" type="button">Scan Paper Trades</button>
       <button id="exportLogBtn" type="button">Export Log</button>
-      <button id="clearPaperBtn" class="danger" type="button">Clear Paper</button>
+      <button id="clearClosedBtn" type="button">Clear Closed Log</button>
+      <button id="clearPaperBtn" class="danger" type="button">Clear All Paper</button>
     </div>
 
     <div class="card">
@@ -491,7 +500,7 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
     <div class="card top">
       <div>
         <h1>Trade Decision Dashboard</h1>
-        <p>One scan checks your watchlist and finds new strong trades. Auto paper logs why it enters or waits.</p>
+        <p>One scan checks your watchlist and finds new strong trades. Auto paper logs why it enters, waits, or exits.</p>
       </div>
       <p>Selected: <b id="selectedName">-</b></p>
     </div>
@@ -661,6 +670,23 @@ function showAlert(title, message, type) {
   }, 10000);
 }
 
+function speak(message) {
+  try {
+    if (!VOICE) {
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    var v = new SpeechSynthesisUtterance(message);
+    v.rate = 0.95;
+
+    window.speechSynthesis.speak(v);
+  } catch (error) {
+    log("SPEAK ERROR: " + error.message);
+  }
+}
+
 function apiJson(path) {
   var url = API + path;
   log("Fetching: " + url);
@@ -775,12 +801,12 @@ function voiceTest() {
   try {
     window.speechSynthesis.cancel();
 
-    var v = new SpeechSynthesisUtterance("Voice test working. JavaScript is running.");
+    var v = new SpeechSynthesisUtterance("Voice test working. Trade alerts will now speak when auto paper enters or exits.");
     v.rate = 0.95;
 
     window.speechSynthesis.speak(v);
 
-    status("Voice working. JavaScript is running.", "good");
+    status("Voice working. Auto paper voice alerts enabled.", "good");
     log("VOICE OK");
   } catch (error) {
     status("Voice failed: " + error.message, "bad");
@@ -890,10 +916,6 @@ function scan() {
       log("SCAN ERROR: " + error.message);
       showAlert("Scan failed", error.message, "bad");
     });
-}
-
-function discover() {
-  scan();
 }
 
 function renderRows() {
@@ -1030,6 +1052,7 @@ function drawChart(r) {
     ctx.fillStyle = "#7dffa8";
     ctx.font = (18 * dpr) + "px Arial";
     ctx.fillText("No chart data returned for this symbol.", 24 * dpr, 42 * dpr);
+    ctx.fillText("The scanner can still use the table values, but the chart needs backend candle data.", 24 * dpr, 74 * dpr);
     return;
   }
 
@@ -1275,6 +1298,7 @@ function toggleAutoPaper() {
   AUTO_PAPER = !AUTO_PAPER;
   localStorage.setItem("autoPaperOn", AUTO_PAPER ? "true" : "false");
   updateAutoState();
+  updateAutoRules();
   log("Auto paper trader " + (AUTO_PAPER ? "enabled." : "disabled."));
 }
 
@@ -1285,6 +1309,32 @@ function updateAutoState() {
   if (btn) {
     btn.textContent = AUTO_PAPER ? "Turn Auto Paper Off" : "Turn Auto Paper On";
   }
+}
+
+function updateAutoRules() {
+  var minScore = el("autoMinScore") ? el("autoMinScore").value : "82";
+  var minRR = el("autoMinRR") ? el("autoMinRR").value : "1.8";
+
+  var box = el("autoRulesBox");
+  if (!box) {
+    return;
+  }
+
+  box.innerHTML =
+    "<b>Entry rules</b><br>" +
+    "1. Auto paper must be ON.<br>" +
+    "2. Scanner decision must be ENTER_NOW.<br>" +
+    "3. Score must be at least " + escapeHtml(minScore) + ".<br>" +
+    "4. Risk/reward must be at least " + escapeHtml(minRR) + ".<br>" +
+    "5. Price, stop, and target must exist.<br>" +
+    "6. Ticker must not already be open.<br><br>" +
+    "<b>Exit rules</b><br>" +
+    "1. Exit if price hits stop.<br>" +
+    "2. Exit if price hits target.<br>" +
+    "3. Exit if scanner changes to AVOID, EXIT, SELL, or TRIM.<br>" +
+    "4. Exit if score falls below 55.<br><br>" +
+    "<b>Voice alerts</b><br>" +
+    "Press Voice Test once. After that, paper entries and exits will speak out loud.";
 }
 
 function setAutoDecision(html) {
@@ -1449,6 +1499,7 @@ function autoPaperCheck() {
         );
 
         showAlert("Paper exit", r.symbol + " exited at " + money(exitPrice) + ". Reason: " + exitReason, "bad");
+        speak("Paper trade exited. " + r.symbol + " at " + money(exitPrice) + ". Reason. " + exitReason + ".");
         log("AUTO PAPER EXIT: " + r.symbol + " at " + money(exitPrice) + ". " + exitReason);
       } else {
         open[r.symbol] = pos;
@@ -1500,6 +1551,7 @@ function autoPaperCheck() {
       );
 
       showAlert("Paper entry", r.symbol + " entered at " + money(r.price) + ". Stop " + money(r.stop) + ". Target " + money(r.target), "");
+      speak("Paper trade entered. " + r.symbol + " at " + money(r.price) + ". Stop " + money(r.stop) + ". Target " + money(r.target) + ".");
       log("AUTO PAPER ENTRY: " + r.symbol + " at " + money(r.price));
       return;
     }
@@ -1563,12 +1615,65 @@ function addPaper() {
   showAlert("Manual paper trade added", sym + " added at " + money(entry), "");
 }
 
+function closePaper(symbol) {
+  var open = getPaperOpen();
+  var closed = getPaperClosed();
+  var pos = open[symbol];
+
+  if (!pos) {
+    return;
+  }
+
+  var r = RESULTS.find(function (x) {
+    return x.symbol === symbol;
+  });
+
+  var exitPrice = r ? Number(r.price) : Number(pos.lastPrice || pos.entry);
+  var entryPrice = Number(pos.entry);
+  var shares = Number(pos.shares || 1);
+  var pnl = (exitPrice - entryPrice) * shares;
+  var pnlPct = ((exitPrice - entryPrice) / entryPrice) * 100;
+
+  closed.unshift({
+    symbol: pos.symbol,
+    entry: entryPrice,
+    exit: exitPrice,
+    shares: shares,
+    pnl: pnl,
+    pnlPct: pnlPct,
+    entryTime: pos.entryTime,
+    exitTime: nowText(),
+    entryReason: pos.entryReason,
+    exitReason: "Manual close",
+    entryScore: pos.entryScore,
+    exitScore: r ? r.score : pos.lastScore,
+    holdNote: pos.holdNote || ""
+  });
+
+  delete open[symbol];
+
+  setPaperOpen(open);
+  setPaperClosed(closed);
+  renderPaper();
+
+  showAlert("Manual paper close", symbol + " closed at " + money(exitPrice) + ". P/L " + money(pnl), pnl >= 0 ? "" : "bad");
+  speak("Paper trade manually closed. " + symbol + " at " + money(exitPrice) + ".");
+  log("MANUAL PAPER CLOSE: " + symbol + " at " + money(exitPrice));
+}
+
 function clearPaper() {
   localStorage.removeItem("paperOpen");
   localStorage.removeItem("paperClosed");
   renderPaper();
   setAutoDecision("Paper trades and logs cleared.");
   log("Paper trades and log cleared.");
+}
+
+function clearClosedLog() {
+  localStorage.removeItem("paperClosed");
+  renderPaper();
+  setAutoDecision("Closed paper trade log cleared. Open paper positions were kept.");
+  log("Closed paper trade log cleared.");
 }
 
 function scanPaper() {
@@ -1617,6 +1722,7 @@ function renderPaper() {
           "Entry time: " + escapeHtml(p.entryTime || "") + "<br>" +
           "Reason: " + escapeHtml(p.entryReason || "") +
           (exitReason ? "<br><b style='color:#ff5577'>Exit signal: " + escapeHtml(exitReason) + "</b>" : "") +
+          "<br><button class='small danger' type='button' onclick='closePaper(" + JSON.stringify(sym) + ")'>Close Paper Trade</button>" +
           "</div>";
       }).join("");
     }
@@ -1663,19 +1769,6 @@ function exportLog() {
   URL.revokeObjectURL(url);
 }
 
-function speak(message) {
-  try {
-    window.speechSynthesis.cancel();
-
-    var v = new SpeechSynthesisUtterance(message);
-    v.rate = 0.95;
-
-    window.speechSynthesis.speak(v);
-  } catch (error) {
-    log("SPEAK ERROR: " + error.message);
-  }
-}
-
 function start() {
   el("selfBtn").addEventListener("click", selfTest);
   el("voiceBtn").addEventListener("click", voiceTest);
@@ -1685,9 +1778,19 @@ function start() {
   el("addPaperBtn").addEventListener("click", addPaper);
   el("scanPaperBtn").addEventListener("click", scanPaper);
   el("clearPaperBtn").addEventListener("click", clearPaper);
+  el("clearClosedBtn").addEventListener("click", clearClosedLog);
   el("exportLogBtn").addEventListener("click", exportLog);
 
+  if (el("autoMinScore")) {
+    el("autoMinScore").addEventListener("input", updateAutoRules);
+  }
+
+  if (el("autoMinRR")) {
+    el("autoMinRR").addEventListener("input", updateAutoRules);
+  }
+
   updateAutoState();
+  updateAutoRules();
 
   status("SCRIPT OK. Full scanner loaded. Press Self Test.", "good");
   log("SCRIPT OK. JavaScript is running.");
