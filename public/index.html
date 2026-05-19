@@ -3,77 +3,392 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>US Trade Bot Scanner</title>
+<title>US Trade Scanner</title>
+
 <style>
-:root{--bg:#020403;--panel:#06150d;--card:rgba(0,15,8,.95);--line:rgba(0,255,136,.34);--text:#d8ffe5;--muted:#9fe9ba;--green:#00ff88;--green2:#7dffa8;--yellow:#ffd166;--red:#ff5577;--blue:#57a6ff;--gray:#cbd5e1}
+:root{
+  --bg:#020403;
+  --panel:#06150d;
+  --card:rgba(0,15,8,.96);
+  --line:rgba(0,255,136,.34);
+  --text:#d8ffe5;
+  --muted:#9fe9ba;
+  --green:#00ff88;
+  --green2:#7dffa8;
+  --yellow:#ffd166;
+  --red:#ff5577;
+  --blue:#57a6ff;
+  --gray:#cbd5e1;
+}
+
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;width:100%;height:100%;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;overflow:hidden}
-#app{position:fixed;inset:0;display:grid;grid-template-columns:286px minmax(0,1fr);background:radial-gradient(circle at top left,rgba(0,255,136,.12),transparent 360px),#020403}
-.side{padding:10px;background:linear-gradient(180deg,#03110a,#06150d);border-right:1px solid var(--line);overflow:auto}
-.main{padding:10px;overflow:auto;min-width:0}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:10px;box-shadow:0 0 18px rgba(0,255,136,.045)}
-h1,h2,h3{margin:0 0 8px;color:var(--green2)}
-h1{font-size:23px}
+
+html,body{
+  margin:0;
+  padding:0;
+  width:100%;
+  height:100%;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+  overflow:hidden;
+}
+
+#app{
+  position:fixed;
+  inset:0;
+  display:grid;
+  grid-template-columns:300px minmax(0,1fr);
+  background:radial-gradient(circle at top left,rgba(0,255,136,.13),transparent 380px),#020403;
+}
+
+.side{
+  padding:10px;
+  background:linear-gradient(180deg,#03110a,#06150d);
+  border-right:1px solid var(--line);
+  overflow:auto;
+}
+
+.main{
+  padding:10px;
+  overflow:auto;
+  min-width:0;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:10px;
+  margin-bottom:10px;
+  box-shadow:0 0 18px rgba(0,255,136,.05);
+}
+
+h1,h2,h3{
+  margin:0 0 8px;
+  color:var(--green2);
+}
+
+h1{font-size:24px}
 h2{font-size:14px;text-transform:uppercase}
 h3{font-size:12px;text-transform:uppercase}
-p{margin:6px 0;color:var(--muted);font-size:13px;line-height:1.45}
-label{display:block;margin:8px 0 4px;color:#8bffb7;font-size:10px;text-transform:uppercase}
-textarea,input,select{width:100%;background:#000;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px;font-size:12px}
-textarea{min-height:92px;resize:vertical}
-button{width:100%;padding:10px;margin-top:8px;border-radius:8px;border:1px solid var(--green);background:#001f12;color:#8bffb7;font-weight:800;cursor:pointer;text-transform:uppercase;font-size:12px}
+
+p{
+  margin:6px 0;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.45;
+}
+
+label{
+  display:block;
+  margin:8px 0 4px;
+  color:#8bffb7;
+  font-size:10px;
+  text-transform:uppercase;
+}
+
+textarea,input,select{
+  width:100%;
+  background:#000;
+  color:var(--text);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:8px;
+  font-size:12px;
+}
+
+textarea{
+  min-height:92px;
+  resize:vertical;
+}
+
+button{
+  width:100%;
+  padding:10px;
+  margin-top:8px;
+  border-radius:8px;
+  border:1px solid var(--green);
+  background:#001f12;
+  color:#8bffb7;
+  font-weight:800;
+  cursor:pointer;
+  text-transform:uppercase;
+  font-size:12px;
+}
+
 button:hover{filter:brightness(1.12)}
 button.primary{background:var(--green);color:#001a0c;border:0}
 button.yellow{background:#211900;color:var(--yellow);border-color:var(--yellow)}
 button.danger{background:#2a0008;color:#ffb8c7;border-color:var(--red)}
-.brand{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.dot{width:14px;height:14px;border-radius:50%;background:var(--red);box-shadow:0 0 14px var(--red)}
-.dot.green{background:var(--green);box-shadow:0 0 14px var(--green)}
-.dot.yellow{background:var(--yellow);box-shadow:0 0 14px var(--yellow)}
-.top{display:flex;justify-content:space-between;gap:12px;align-items:flex-end}
-.kpis{display:grid;grid-template-columns:repeat(6,minmax(110px,1fr));gap:8px;margin-bottom:10px}
-.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px}
-.kpi span{display:block;color:var(--muted);font-size:10px;text-transform:uppercase}
-.kpi strong{display:block;margin-top:4px;color:#fff;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.table-wrap{overflow:auto;max-height:42vh;border:1px solid rgba(0,255,136,.2);border-radius:10px;background:#000}
-table{width:100%;border-collapse:collapse;min-width:1120px}
-th,td{border-bottom:1px solid rgba(0,255,136,.15);padding:9px;font-size:13px;text-align:left;vertical-align:top}
-th{position:sticky;top:0;background:#03110a;color:var(--green2);font-size:10px;text-transform:uppercase;z-index:2}
+
+.brand{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+
+.dot{
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  background:var(--red);
+  box-shadow:0 0 14px var(--red);
+}
+
+.dot.green{
+  background:var(--green);
+  box-shadow:0 0 14px var(--green);
+}
+
+.dot.yellow{
+  background:var(--yellow);
+  box-shadow:0 0 14px var(--yellow);
+}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-end;
+}
+
+.kpis{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(110px,1fr));
+  gap:8px;
+  margin-bottom:10px;
+}
+
+.kpi{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:8px;
+}
+
+.kpi span{
+  display:block;
+  color:var(--muted);
+  font-size:10px;
+  text-transform:uppercase;
+}
+
+.kpi strong{
+  display:block;
+  margin-top:4px;
+  color:#fff;
+  font-size:14px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.table-wrap{
+  overflow:auto;
+  max-height:42vh;
+  border:1px solid rgba(0,255,136,.2);
+  border-radius:10px;
+  background:#000;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:1180px;
+}
+
+th,td{
+  border-bottom:1px solid rgba(0,255,136,.15);
+  padding:9px;
+  font-size:13px;
+  text-align:left;
+  vertical-align:top;
+}
+
+th{
+  position:sticky;
+  top:0;
+  background:#03110a;
+  color:var(--green2);
+  font-size:10px;
+  text-transform:uppercase;
+  z-index:2;
+}
+
 tbody tr{cursor:pointer}
 tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
-.badge{display:inline-block;min-width:108px;text-align:center;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:800;background:rgba(255,209,102,.16);color:var(--yellow);border:1px solid rgba(255,209,102,.4)}
-.badge.enter{background:rgba(0,255,136,.16);color:var(--green);border-color:rgba(0,255,136,.4)}
-.badge.exit{background:rgba(255,85,119,.16);color:var(--red);border-color:rgba(255,85,119,.4)}
-.badge.avoid{background:rgba(156,163,175,.16);color:var(--gray);border-color:rgba(156,163,175,.4)}
-.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
-.level{background:#000;border:1px solid rgba(0,255,136,.2);border-radius:9px;padding:9px}
-.level span{display:block;color:var(--muted);font-size:10px;text-transform:uppercase}
-.level strong{display:block;color:#fff;margin-top:4px;font-size:14px}
-.note{background:#000;border:1px solid rgba(0,255,136,.2);border-radius:9px;padding:10px;font-size:13px;line-height:1.5;margin-top:8px}
+
+.badge{
+  display:inline-block;
+  min-width:112px;
+  text-align:center;
+  border-radius:999px;
+  padding:5px 9px;
+  font-size:11px;
+  font-weight:800;
+  background:rgba(255,209,102,.16);
+  color:var(--yellow);
+  border:1px solid rgba(255,209,102,.4);
+}
+
+.badge.enter{
+  background:rgba(0,255,136,.16);
+  color:var(--green);
+  border-color:rgba(0,255,136,.4);
+}
+
+.badge.exit{
+  background:rgba(255,85,119,.16);
+  color:var(--red);
+  border-color:rgba(255,85,119,.4);
+}
+
+.badge.avoid{
+  background:rgba(156,163,175,.16);
+  color:var(--gray);
+  border-color:rgba(156,163,175,.4);
+}
+
+.grid4{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin-bottom:10px;
+}
+
+.grid3{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-bottom:10px;
+}
+
+.level{
+  background:#000;
+  border:1px solid rgba(0,255,136,.2);
+  border-radius:9px;
+  padding:9px;
+}
+
+.level span{
+  display:block;
+  color:var(--muted);
+  font-size:10px;
+  text-transform:uppercase;
+}
+
+.level strong{
+  display:block;
+  color:#fff;
+  margin-top:4px;
+  font-size:14px;
+}
+
+.note{
+  background:#000;
+  border:1px solid rgba(0,255,136,.2);
+  border-radius:9px;
+  padding:10px;
+  font-size:13px;
+  line-height:1.5;
+  margin-top:8px;
+}
+
 .warn{border-color:rgba(255,85,119,.45)}
-#chart{width:100%;height:470px;display:block;background:#000;border:1px solid var(--green);border-radius:12px}
-.log{white-space:pre-wrap;background:#000;border:1px solid rgba(0,255,136,.25);border-radius:8px;padding:8px;font-size:12px;max-height:180px;overflow:auto}
-.paper-row{display:grid;grid-template-columns:1.2fr .9fr .8fr auto;gap:8px;align-items:end}
-.holding{background:#000;border:1px solid rgba(0,255,136,.2);border-radius:9px;padding:8px;margin-top:8px;font-size:12px;line-height:1.45}
-.alert{position:fixed;right:18px;top:18px;z-index:1000;display:none;max-width:440px;background:#00190d;border:2px solid var(--green);border-radius:14px;padding:14px 16px;box-shadow:0 0 32px rgba(0,255,136,.25);line-height:1.45}
+
+#chart{
+  width:100%;
+  height:470px;
+  display:block;
+  background:#000;
+  border:1px solid var(--green);
+  border-radius:12px;
+}
+
+.log{
+  white-space:pre-wrap;
+  background:#000;
+  border:1px solid rgba(0,255,136,.25);
+  border-radius:8px;
+  padding:8px;
+  font-size:12px;
+  max-height:180px;
+  overflow:auto;
+}
+
+.paper-row{
+  display:grid;
+  grid-template-columns:1.2fr .9fr .8fr auto;
+  gap:8px;
+  align-items:end;
+}
+
+.holding{
+  background:#000;
+  border:1px solid rgba(0,255,136,.2);
+  border-radius:9px;
+  padding:8px;
+  margin-top:8px;
+  font-size:12px;
+  line-height:1.45;
+}
+
+.holding.bad{
+  border-color:rgba(255,85,119,.55);
+}
+
+.holding.good{
+  border-color:rgba(0,255,136,.55);
+}
+
+.alert{
+  position:fixed;
+  right:18px;
+  top:18px;
+  z-index:1000;
+  display:none;
+  max-width:460px;
+  background:#00190d;
+  border:2px solid var(--green);
+  border-radius:14px;
+  padding:14px 16px;
+  box-shadow:0 0 32px rgba(0,255,136,.25);
+  line-height:1.45;
+}
+
 .alert.bad{border-color:var(--red)}
 .alert.warn{border-color:var(--yellow)}
-.footer-note{font-size:12px;color:var(--muted)}
+
+.footer-note{
+  font-size:12px;
+  color:var(--muted);
+}
+
 @media(max-width:950px){
   html,body{overflow:auto}
-  #app{position:relative;grid-template-columns:1fr;min-height:100vh}
-  .kpis,.grid4,.paper-row{grid-template-columns:1fr}
+  #app{
+    position:relative;
+    grid-template-columns:1fr;
+    min-height:100vh;
+  }
+  .kpis,.grid4,.grid3,.paper-row{
+    grid-template-columns:1fr;
+  }
   #chart{height:340px}
-  table{min-width:950px}
+  table{min-width:980px}
 }
 </style>
 </head>
+
 <body>
 <div id="app">
   <aside class="side">
     <div class="card brand">
       <div>
         <h2>US Trade Bot</h2>
-        <p>Render-hosted full scanner</p>
+        <p>Render full scanner</p>
       </div>
       <div id="dot" class="dot"></div>
     </div>
@@ -90,14 +405,18 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
 
     <div class="card">
       <h2>Scanner Controls</h2>
+
       <label>Mode</label>
       <select id="mode">
         <option value="swing" selected>PDT-safe Swing</option>
         <option value="both">Both context</option>
       </select>
-      <p>Day trading is intentionally avoided for PDT safety.</p>
+
+      <p>Day trading is avoided. This is built around swing setups and paper testing.</p>
+
       <label>Watchlist</label>
       <textarea id="symbols">SPY,QQQ,NVDA,TSLA,AAPL,MSFT,META,AMD,PLTR,COST,LLY,UNH,JPM,AVGO</textarea>
+
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
         <div>
           <label>Risk $</label>
@@ -120,7 +439,21 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
     </div>
 
     <div class="card">
-      <h2>Paper Trades</h2>
+      <h2>Auto Paper Trader</h2>
+      <p>Auto paper: <b id="autoState">Off</b></p>
+      <button id="autoBtn" class="yellow" type="button">Turn Auto Paper On</button>
+
+      <label>Minimum score to auto-enter</label>
+      <input id="autoMinScore" type="number" value="82" min="50" max="100">
+
+      <label>Minimum risk/reward</label>
+      <input id="autoMinRR" type="number" value="1.8" step="0.1">
+
+      <p>Auto enters only strong ENTER_NOW setups. It exits on stop, target, avoid/exit signal, or score breakdown.</p>
+    </div>
+
+    <div class="card">
+      <h2>Manual Paper Trade</h2>
       <div class="paper-row">
         <div>
           <label>Symbol</label>
@@ -136,9 +469,10 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
         </div>
         <button id="addPaperBtn" type="button">Add</button>
       </div>
+
       <button id="scanPaperBtn" type="button">Scan Paper Trades</button>
+      <button id="exportLogBtn" type="button">Export Log</button>
       <button id="clearPaperBtn" class="danger" type="button">Clear Paper</button>
-      <div id="paperBox"><p>No paper trades yet.</p></div>
     </div>
 
     <div class="card">
@@ -151,7 +485,7 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
     <div class="card top">
       <div>
         <h1>Trade Decision Dashboard</h1>
-        <p>Scanner, chart, loop, discovery, alerts, paper tracking, and education all served by Render.</p>
+        <p>Scanner, chart, auto paper trader, paper log, alerts, discovery, education, and loop timer.</p>
       </div>
       <p>Selected: <b id="selectedName">-</b></p>
     </div>
@@ -162,12 +496,12 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
       <div class="kpi"><span>Market</span><strong id="marketKpi">-</strong></div>
       <div class="kpi"><span>Signals</span><strong id="signalCount">0</strong></div>
       <div class="kpi"><span>Top</span><strong id="topSignal">-</strong></div>
-      <div class="kpi"><span>Paper</span><strong id="paperCount">0</strong></div>
+      <div class="kpi"><span>Open Paper</span><strong id="paperCount">0</strong></div>
     </section>
 
     <div class="card">
       <h2>Ranked Signals</h2>
-      <p>Sorted by score. Click a row to hear the trade plan.</p>
+      <p>Best choices stay at the top. Weak or pointless tickers are not promoted.</p>
       <div class="table-wrap">
         <table>
           <thead>
@@ -212,6 +546,16 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
     </div>
 
     <div class="card">
+      <h2>Open Paper Positions</h2>
+      <div id="paperBox"><p>No open paper trades yet.</p></div>
+    </div>
+
+    <div class="card">
+      <h2>Closed Paper Trade Log</h2>
+      <div id="closedBox"><p>No closed trades yet.</p></div>
+    </div>
+
+    <div class="card">
       <h2>Education / Why This Trade</h2>
       <div id="education" class="note">Select a trade to see why the scanner ranked it and what chart signals mattered.</div>
       <p class="footer-note">Paper-trading tool only. Not financial advice. Always use your own judgment and risk controls.</p>
@@ -231,6 +575,7 @@ var NEXT_SCAN = 0;
 var TIMER = null;
 var KEEP_TIMER = null;
 var ALERT_TIMER = null;
+var AUTO_PAPER = localStorage.getItem("autoPaperOn") === "true";
 
 function el(id) {
   return document.getElementById(id);
@@ -264,10 +609,11 @@ function num(value) {
 
 function pad(value) {
   value = Number(value);
-  if (value < 10) {
-    return "0" + value;
-  }
-  return String(value);
+  return value < 10 ? "0" + value : String(value);
+}
+
+function nowText() {
+  return new Date().toLocaleString();
 }
 
 function log(message) {
@@ -469,7 +815,8 @@ function scan() {
         speak("Top result is " + RESULTS[0].symbol + ". Score " + RESULTS[0].score + ".");
       }
 
-      checkTradeAlerts();
+      autoPaperCheck();
+      renderPaper();
     })
     .catch(function (error) {
       status("Scan failed: " + error.message, "bad");
@@ -504,6 +851,9 @@ function discover() {
       if (RESULTS.length) {
         selectTrade(0, false);
       }
+
+      autoPaperCheck();
+      renderPaper();
     })
     .catch(function (error) {
       status("Discovery failed: " + error.message, "bad");
@@ -601,11 +951,10 @@ function selectTrade(index, speakIt) {
 
   el("education").innerHTML =
     "<b>Why it ranked:</b><br>" + reasons +
-    "<br><br><b>Entry rule:</b> If it says wait for pullback, do not chase. Wait for price near the buy zone." +
-    "<br><br><b>Exit rule:</b> Respect the stop. Review if the score or trend breaks down.";
+    "<br><br><b>Entry rule:</b> Auto paper only enters if the backend says ENTER_NOW, score is strong, risk/reward is acceptable, and the ticker is not already open." +
+    "<br><br><b>Exit rule:</b> Auto paper exits if price hits stop, reaches target, the signal becomes AVOID/EXIT/SELL/TRIM, or the score drops below the safety level.";
 
   drawChart(r);
-  renderPaper();
 
   if (speakIt && VOICE) {
     speak(r.symbol + " selected. Decision " + String(r.decision).replace(/_/g, " ") + ". Score " + r.score + ". Stop " + money(r.stop) + ". Target " + money(r.target) + ".");
@@ -864,58 +1213,248 @@ function toggleLoop() {
   log("Loop started. Refresh every " + minutes + " minutes.");
 }
 
-function getPaper() {
+function getPaperOpen() {
   try {
-    return JSON.parse(localStorage.getItem("paperTrades") || "{}");
+    return JSON.parse(localStorage.getItem("paperOpen") || "{}");
   } catch (e) {
     return {};
   }
 }
 
-function setPaper(p) {
-  localStorage.setItem("paperTrades", JSON.stringify(p));
+function setPaperOpen(p) {
+  localStorage.setItem("paperOpen", JSON.stringify(p));
+}
+
+function getPaperClosed() {
+  try {
+    return JSON.parse(localStorage.getItem("paperClosed") || "[]");
+  } catch (e) {
+    return [];
+  }
+}
+
+function setPaperClosed(p) {
+  localStorage.setItem("paperClosed", JSON.stringify(p));
+}
+
+function toggleAutoPaper() {
+  AUTO_PAPER = !AUTO_PAPER;
+  localStorage.setItem("autoPaperOn", AUTO_PAPER ? "true" : "false");
+  updateAutoState();
+  log("Auto paper trader " + (AUTO_PAPER ? "enabled." : "disabled."));
+}
+
+function updateAutoState() {
+  setText("autoState", AUTO_PAPER ? "On" : "Off");
+
+  var btn = el("autoBtn");
+  if (btn) {
+    btn.textContent = AUTO_PAPER ? "Turn Auto Paper Off" : "Turn Auto Paper On";
+  }
+}
+
+function canAutoEnter(r, open) {
+  var minScore = Number(el("autoMinScore") ? el("autoMinScore").value : 82);
+  var minRR = Number(el("autoMinRR") ? el("autoMinRR").value : 1.8);
+
+  if (!Number.isFinite(minScore)) {
+    minScore = 82;
+  }
+
+  if (!Number.isFinite(minRR)) {
+    minRR = 1.8;
+  }
+
+  if (open[r.symbol]) {
+    return false;
+  }
+
+  if (!/ENTER_NOW/i.test(String(r.decision))) {
+    return false;
+  }
+
+  if (Number(r.score) < minScore) {
+    return false;
+  }
+
+  if (Number(r.rr) < minRR) {
+    return false;
+  }
+
+  if (!Number.isFinite(Number(r.price)) || !Number.isFinite(Number(r.stop)) || !Number.isFinite(Number(r.target))) {
+    return false;
+  }
+
+  return true;
+}
+
+function shouldAutoExit(position, r) {
+  var price = Number(r ? r.price : position.lastPrice || position.entry);
+  var stop = Number(position.stop);
+  var target = Number(position.target);
+  var score = r ? Number(r.score) : Number(position.entryScore || 0);
+  var decision = r ? String(r.decision) : "";
+
+  if (Number.isFinite(stop) && price <= stop) {
+    return "Stop hit";
+  }
+
+  if (Number.isFinite(target) && price >= target) {
+    return "Target hit";
+  }
+
+  if (/AVOID|EXIT|SELL|TRIM/i.test(decision)) {
+    return "Scanner changed to " + decision.replace(/_/g, " ");
+  }
+
+  if (Number.isFinite(score) && score < 55) {
+    return "Score breakdown below 55";
+  }
+
+  return "";
+}
+
+function autoPaperCheck() {
+  if (!AUTO_PAPER) {
+    return;
+  }
+
+  var open = getPaperOpen();
+  var closed = getPaperClosed();
+
+  RESULTS.forEach(function (r) {
+    var pos = open[r.symbol];
+
+    if (pos) {
+      pos.lastPrice = r.price;
+      pos.lastScore = r.score;
+      pos.lastDecision = r.decision;
+
+      var exitReason = shouldAutoExit(pos, r);
+
+      if (exitReason) {
+        var exitPrice = Number(r.price);
+        var entryPrice = Number(pos.entry);
+        var shares = Number(pos.shares || 1);
+        var pnl = (exitPrice - entryPrice) * shares;
+        var pnlPct = ((exitPrice - entryPrice) / entryPrice) * 100;
+
+        closed.unshift({
+          symbol: pos.symbol,
+          entry: entryPrice,
+          exit: exitPrice,
+          shares: shares,
+          pnl: pnl,
+          pnlPct: pnlPct,
+          entryTime: pos.entryTime,
+          exitTime: nowText(),
+          entryReason: pos.entryReason,
+          exitReason: exitReason,
+          entryScore: pos.entryScore,
+          exitScore: r.score,
+          holdNote: pos.holdNote || ""
+        });
+
+        delete open[r.symbol];
+
+        showAlert("Paper exit", r.symbol + " exited at " + money(exitPrice) + ". Reason: " + exitReason, "bad");
+        log("AUTO PAPER EXIT: " + r.symbol + " at " + money(exitPrice) + ". " + exitReason);
+      } else {
+        open[r.symbol] = pos;
+      }
+
+      return;
+    }
+
+    if (canAutoEnter(r, open)) {
+      var riskDollars = Number(el("risk") ? el("risk").value : 100);
+      var riskPerShare = Math.max(0.01, Number(r.price) - Number(r.stop));
+      var shares = Math.max(1, Math.floor(riskDollars / riskPerShare));
+
+      open[r.symbol] = {
+        symbol: r.symbol,
+        entry: Number(r.price),
+        shares: shares,
+        stop: Number(r.stop),
+        target: Number(r.target),
+        target2: Number(r.target2 || r.target),
+        entryScore: Number(r.score),
+        entryDecision: r.decision,
+        entryTime: nowText(),
+        entryReason: r.summary,
+        actionPlan: r.plan,
+        holdNote: r.hold,
+        lastPrice: Number(r.price),
+        lastScore: Number(r.score),
+        lastDecision: r.decision
+      };
+
+      showAlert("Paper entry", r.symbol + " entered at " + money(r.price) + ". Stop " + money(r.stop) + ". Target " + money(r.target), "");
+      log("AUTO PAPER ENTRY: " + r.symbol + " at " + money(r.price));
+    }
+  });
+
+  setPaperOpen(open);
+  setPaperClosed(closed);
 }
 
 function addPaper() {
   var sym = (el("paperSymbol").value || "").trim().toUpperCase();
   var entry = Number(el("paperEntry").value);
-  var shares = Number(el("paperShares").value || 0);
+  var shares = Number(el("paperShares").value || 1);
 
   if (!sym || !Number.isFinite(entry)) {
     showAlert("Paper trade missing info", "Add symbol and entry price.", "warn");
     return;
   }
 
-  var p = getPaper();
+  if (!Number.isFinite(shares) || shares <= 0) {
+    shares = 1;
+  }
 
-  p[sym] = {
+  var open = getPaperOpen();
+
+  open[sym] = {
+    symbol: sym,
     entry: entry,
-    shares: Number.isFinite(shares) ? shares : 0,
-    time: new Date().toLocaleString()
+    shares: shares,
+    stop: null,
+    target: null,
+    target2: null,
+    entryScore: null,
+    entryDecision: "MANUAL",
+    entryTime: nowText(),
+    entryReason: "Manual paper trade",
+    actionPlan: "",
+    holdNote: "",
+    lastPrice: entry,
+    lastScore: null,
+    lastDecision: "MANUAL"
   };
 
-  setPaper(p);
+  setPaperOpen(open);
 
   el("paperSymbol").value = "";
   el("paperEntry").value = "";
   el("paperShares").value = "";
 
   renderPaper();
-  showAlert("Paper trade added", sym + " added at " + money(entry), "");
+  showAlert("Manual paper trade added", sym + " added at " + money(entry), "");
 }
 
 function clearPaper() {
-  localStorage.removeItem("paperTrades");
+  localStorage.removeItem("paperOpen");
+  localStorage.removeItem("paperClosed");
   renderPaper();
-  log("Paper trades cleared.");
+  log("Paper trades and log cleared.");
 }
 
 function scanPaper() {
-  var p = getPaper();
-  var keys = Object.keys(p);
+  var open = getPaperOpen();
+  var keys = Object.keys(open);
 
   if (!keys.length) {
-    showAlert("No paper trades", "Add a paper trade first.", "warn");
+    showAlert("No paper trades", "Add or auto-enter a paper trade first.", "warn");
     return;
   }
 
@@ -924,52 +1463,82 @@ function scanPaper() {
 }
 
 function renderPaper() {
-  var p = getPaper();
-  var keys = Object.keys(p);
+  var open = getPaperOpen();
+  var closed = getPaperClosed();
+  var keys = Object.keys(open);
 
   setText("paperCount", keys.length);
 
   var box = el("paperBox");
-  if (!box) {
-    return;
+  if (box) {
+    if (!keys.length) {
+      box.innerHTML = "<p>No open paper trades yet.</p>";
+    } else {
+      box.innerHTML = keys.map(function (sym) {
+        var p = open[sym];
+        var r = RESULTS.find(function (x) {
+          return x.symbol === sym;
+        });
+
+        var now = r ? Number(r.price) : Number(p.lastPrice || p.entry);
+        var pnl = (now - Number(p.entry)) * Number(p.shares || 1);
+        var pnlPct = ((now - Number(p.entry)) / Number(p.entry)) * 100;
+        var cls = pnl >= 0 ? "holding good" : "holding bad";
+        var exitReason = r ? shouldAutoExit(p, r) : "";
+
+        return "<div class='" + cls + "'>" +
+          "<b>" + escapeHtml(sym) + " open</b><br>" +
+          "Entry: " + money(p.entry) + " | Now: " + money(now) + " | Shares: " + escapeHtml(p.shares || 1) + "<br>" +
+          "P/L: " + money(pnl) + " (" + pnlPct.toFixed(2) + "%)<br>" +
+          "Stop: " + money(p.stop) + " | Target: " + money(p.target) + "<br>" +
+          "Entry score: " + escapeHtml(p.entryScore || "-") + " | Last score: " + escapeHtml(r ? r.score : p.lastScore || "-") + "<br>" +
+          "Entry time: " + escapeHtml(p.entryTime || "") + "<br>" +
+          "Reason: " + escapeHtml(p.entryReason || "") +
+          (exitReason ? "<br><b style='color:#ff5577'>Exit signal: " + escapeHtml(exitReason) + "</b>" : "") +
+          "</div>";
+      }).join("");
+    }
   }
 
-  if (!keys.length) {
-    box.innerHTML = "<p>No paper trades yet.</p>";
-    return;
+  var closedBox = el("closedBox");
+  if (closedBox) {
+    if (!closed.length) {
+      closedBox.innerHTML = "<p>No closed trades yet.</p>";
+    } else {
+      closedBox.innerHTML = closed.slice(0, 40).map(function (t) {
+        var good = Number(t.pnl) >= 0;
+        return "<div class='" + (good ? "holding good" : "holding bad") + "'>" +
+          "<b>" + escapeHtml(t.symbol) + " closed</b><br>" +
+          "Entry: " + money(t.entry) + " | Exit: " + money(t.exit) + " | Shares: " + escapeHtml(t.shares) + "<br>" +
+          "P/L: " + money(t.pnl) + " (" + Number(t.pnlPct).toFixed(2) + "%)<br>" +
+          "Entry time: " + escapeHtml(t.entryTime) + "<br>" +
+          "Exit time: " + escapeHtml(t.exitTime) + "<br>" +
+          "Entry reason: " + escapeHtml(t.entryReason || "") + "<br>" +
+          "Exit reason: " + escapeHtml(t.exitReason || "") +
+          "</div>";
+      }).join("");
+    }
   }
-
-  box.innerHTML = keys.map(function (sym) {
-    var t = p[sym];
-    var r = RESULTS.find(function (x) {
-      return x.symbol === sym;
-    });
-
-    var now = r ? num(r.price) : null;
-    var pl = Number.isFinite(now) ? ((now - t.entry) / t.entry) * 100 : null;
-    var decision = r ? String(r.decision).replace(/_/g, " ") : "Not scanned";
-
-    var exitText = r && /EXIT|SELL|TRIM|AVOID/i.test(String(r.decision))
-      ? "<br><b style='color:#ff5577'>Exit/review alert</b>"
-      : "";
-
-    return "<div class='holding'><b>" + escapeHtml(sym) + " - " + escapeHtml(decision) + "</b><br>" +
-      "Entry " + money(t.entry) +
-      (Number.isFinite(now) ? " - Now " + money(now) + " - P/L " + pl.toFixed(2) + "%" : "") +
-      "<br>" + escapeHtml(t.time || "") + exitText + "</div>";
-  }).join("");
 }
 
-function checkTradeAlerts() {
-  RESULTS.slice(0, 4).forEach(function (r) {
-    if (/ENTER|BUY|ENTRY/i.test(String(r.decision))) {
-      showAlert("Trade entry alert", r.symbol + " is showing " + String(r.decision).replace(/_/g, " ") + " at about " + money(r.price), "");
-    }
+function exportLog() {
+  var data = {
+    exportedAt: nowText(),
+    open: getPaperOpen(),
+    closed: getPaperClosed()
+  };
 
-    if (/EXIT|SELL|TRIM/i.test(String(r.decision))) {
-      showAlert("Trade exit alert", r.symbol + " is showing " + String(r.decision).replace(/_/g, " ") + " at about " + money(r.price), "bad");
-    }
-  });
+  var text = JSON.stringify(data, null, 2);
+  var blob = new Blob([text], { type: "application/json" });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+
+  a.href = url;
+  a.download = "paper-trade-log.json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 function speak(message) {
@@ -991,9 +1560,13 @@ function start() {
   el("scanBtn").addEventListener("click", scan);
   el("discoverBtn").addEventListener("click", discover);
   el("loopBtn").addEventListener("click", toggleLoop);
+  el("autoBtn").addEventListener("click", toggleAutoPaper);
   el("addPaperBtn").addEventListener("click", addPaper);
   el("scanPaperBtn").addEventListener("click", scanPaper);
   el("clearPaperBtn").addEventListener("click", clearPaper);
+  el("exportLogBtn").addEventListener("click", exportLog);
+
+  updateAutoState();
 
   status("SCRIPT OK. Full scanner loaded. Press Self Test.", "good");
   log("SCRIPT OK. JavaScript is running.");
