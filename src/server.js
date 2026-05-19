@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const VERSION = "24.0.0";
+const VERSION = "25.0.0";
 
 const DEFAULT_SYMBOLS = [
   "SPY", "QQQ", "AAPL", "MSFT", "NVDA", "AMZN", "META", "GOOGL",
@@ -31,7 +31,8 @@ const cache = new Map();
 
 app.use(helmet({
   crossOriginResourcePolicy: false,
-  contentSecurityPolicy: false
+  contentSecurityPolicy: false,
+  frameguard: false
 }));
 
 app.use(cors({ origin: "*" }));
