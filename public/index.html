@@ -399,7 +399,6 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
       <button id="selfBtn" type="button">Self Test</button>
       <button id="voiceBtn" type="button">Voice Test</button>
       <button id="scanBtn" class="primary" type="button">Scan Now</button>
-      <button id="discoverBtn" class="yellow" type="button">Find New Trades</button>
       <button id="loopBtn" type="button">Start Loop</button>
     </div>
 
@@ -412,7 +411,7 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
         <option value="both">Both context</option>
       </select>
 
-      <p>Day trading is avoided. This is built around swing setups and paper testing.</p>
+      <p>Day trading is avoided. Scan Now checks your watchlist and finds new trades at the same time.</p>
 
       <label>Watchlist</label>
       <textarea id="symbols">SPY,QQQ,NVDA,TSLA,AAPL,MSFT,META,AMD,PLTR,COST,LLY,UNH,JPM,AVGO</textarea>
@@ -453,6 +452,13 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
     </div>
 
     <div class="card">
+      <h2>Auto Paper Decision</h2>
+      <div id="autoDecisionBox" class="note">
+        Waiting for scan. This will show why the paper trader entered or did not enter.
+      </div>
+    </div>
+
+    <div class="card">
       <h2>Manual Paper Trade</h2>
       <div class="paper-row">
         <div>
@@ -485,7 +491,7 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
     <div class="card top">
       <div>
         <h1>Trade Decision Dashboard</h1>
-        <p>Scanner, chart, auto paper trader, paper log, alerts, discovery, education, and loop timer.</p>
+        <p>One scan checks your watchlist and finds new strong trades. Auto paper logs why it enters or waits.</p>
       </div>
       <p>Selected: <b id="selectedName">-</b></p>
     </div>
@@ -501,7 +507,7 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
 
     <div class="card">
       <h2>Ranked Signals</h2>
-      <p>Best choices stay at the top. Weak or pointless tickers are not promoted.</p>
+      <p>Best choices stay at the top. Weak or pointless tickers are filtered out.</p>
       <div class="table-wrap">
         <table>
           <thead>
@@ -783,29 +789,90 @@ function voiceTest() {
 }
 
 function scan() {
-  status("Scanning watchlist...", "work");
+  status("Scanning watchlist and finding new trades...", "work");
 
   var risk = el("risk") ? el("risk").value : "100";
   var mode = el("mode") ? el("mode").value : "swing";
+  var symbols = getSymbols();
 
-  apiJson("/api/scan?mode=" + encodeURIComponent(mode) + "&symbols=" + encodeURIComponent(getSymbols()) + "&risk=" + encodeURIComponent(risk || "100"))
-    .then(function (data) {
-      var list = data.signals || data.results || data.data || [];
+  var scanUrl = "/api/scan?mode=" + encodeURIComponent(mode) + "&symbols=" + encodeURIComponent(symbols) + "&risk=" + encodeURIComponent(risk || "100");
+  var discoverUrl = "/api/discover?risk=" + encodeURIComponent(risk || "100") + "&limit=12&exclude=" + encodeURIComponent(symbols);
 
-      RESULTS = list.map(clean).sort(function (a, b) {
-        return Number(b.rank || b.score || 0) - Number(a.rank || a.score || 0);
+  Promise.allSettled([
+    apiJson(scanUrl),
+    apiJson(discoverUrl)
+  ])
+    .then(function (results) {
+      var allSignals = [];
+      var errors = [];
+
+      if (results[0].status === "fulfilled") {
+        var scanData = results[0].value;
+        var scanList = scanData.signals || scanData.results || scanData.data || [];
+        allSignals = allSignals.concat(scanList);
+        setText("marketKpi", scanData.market || "-");
+      } else {
+        errors.push("Watchlist scan failed: " + results[0].reason.message);
+      }
+
+      if (results[1].status === "fulfilled") {
+        var discoverData = results[1].value;
+        var discoverList = discoverData.signals || discoverData.results || discoverData.data || [];
+        allSignals = allSignals.concat(discoverList);
+      } else {
+        errors.push("New trade scan failed: " + results[1].reason.message);
+      }
+
+      var seen = {};
+      var cleanList = [];
+
+      allSignals.forEach(function (item) {
+        var r = clean(item);
+
+        if (!r.symbol || r.symbol === "-") {
+          return;
+        }
+
+        if (seen[r.symbol]) {
+          var existing = seen[r.symbol];
+
+          if (Number(r.rank || r.score || 0) > Number(existing.rank || existing.score || 0)) {
+            seen[r.symbol] = r;
+          }
+
+          return;
+        }
+
+        seen[r.symbol] = r;
       });
+
+      Object.keys(seen).forEach(function (symbol) {
+        cleanList.push(seen[symbol]);
+      });
+
+      RESULTS = cleanList
+        .filter(function (r) {
+          return Number(r.score || 0) >= 58 && !/AVOID/i.test(String(r.decision));
+        })
+        .sort(function (a, b) {
+          return Number(b.rank || b.score || 0) - Number(a.rank || a.score || 0);
+        });
 
       renderRows();
 
       setText("updated", new Date().toLocaleTimeString());
       setText("signalCount", RESULTS.length);
-      setText("marketKpi", data.market || "-");
       setText("topSignal", RESULTS[0] ? RESULTS[0].symbol : "-");
       setText("lastScan", new Date().toLocaleTimeString());
 
-      status("Scan complete. " + RESULTS.length + " results.", "good");
-      log("SCAN OK. Results: " + RESULTS.length);
+      if (errors.length) {
+        status("Scan finished with warning. " + RESULTS.length + " results.", "good");
+        log(errors.join(" | "));
+      } else {
+        status("Scan complete. " + RESULTS.length + " results.", "good");
+      }
+
+      log("SCAN OK. Watchlist plus new trades. Results: " + RESULTS.length);
 
       if (RESULTS.length) {
         selectTrade(0, false);
@@ -826,40 +893,7 @@ function scan() {
 }
 
 function discover() {
-  status("Finding new trades...", "work");
-
-  var risk = el("risk") ? el("risk").value : "100";
-
-  apiJson("/api/discover?risk=" + encodeURIComponent(risk || "100") + "&limit=12&exclude=" + encodeURIComponent(getSymbols()))
-    .then(function (data) {
-      var list = data.signals || data.results || data.data || [];
-
-      RESULTS = list.map(clean).sort(function (a, b) {
-        return Number(b.rank || b.score || 0) - Number(a.rank || a.score || 0);
-      });
-
-      renderRows();
-
-      setText("updated", new Date().toLocaleTimeString());
-      setText("signalCount", RESULTS.length);
-      setText("marketKpi", data.market || "-");
-      setText("topSignal", RESULTS[0] ? RESULTS[0].symbol : "-");
-
-      status("Discovery complete. " + RESULTS.length + " results.", "good");
-      log("DISCOVERY OK. Results: " + RESULTS.length);
-
-      if (RESULTS.length) {
-        selectTrade(0, false);
-      }
-
-      autoPaperCheck();
-      renderPaper();
-    })
-    .catch(function (error) {
-      status("Discovery failed: " + error.message, "bad");
-      log("DISCOVERY ERROR: " + error.message);
-      showAlert("Discovery failed", error.message, "bad");
-    });
+  scan();
 }
 
 function renderRows() {
@@ -1253,6 +1287,43 @@ function updateAutoState() {
   }
 }
 
+function setAutoDecision(html) {
+  var box = el("autoDecisionBox");
+  if (box) {
+    box.innerHTML = html;
+  }
+}
+
+function autoRejectReason(r, open) {
+  var minScore = Number(el("autoMinScore") ? el("autoMinScore").value : 82);
+  var minRR = Number(el("autoMinRR") ? el("autoMinRR").value : 1.8);
+  var lines = [];
+
+  lines.push("<b>" + escapeHtml(r.symbol) + " not entered</b>");
+
+  if (open[r.symbol]) {
+    lines.push("Reason: already has an open paper position.");
+  } else if (!/ENTER_NOW/i.test(String(r.decision))) {
+    lines.push("Reason: scanner says " + escapeHtml(String(r.decision).replace(/_/g, " ")) + ", not ENTER_NOW.");
+  } else if (Number(r.score) < minScore) {
+    lines.push("Reason: score " + escapeHtml(r.score) + " is below minimum " + escapeHtml(minScore) + ".");
+  } else if (Number(r.rr) < minRR) {
+    lines.push("Reason: risk/reward " + escapeHtml(r.rr) + " is below minimum " + escapeHtml(minRR) + ".");
+  } else if (!Number.isFinite(Number(r.price)) || !Number.isFinite(Number(r.stop)) || !Number.isFinite(Number(r.target))) {
+    lines.push("Reason: missing price, stop, or target.");
+  } else {
+    lines.push("Reason: passed close review, but no auto action was taken.");
+  }
+
+  lines.push("Score: " + escapeHtml(r.score));
+  lines.push("Decision: " + escapeHtml(String(r.decision).replace(/_/g, " ")));
+  lines.push("R/R: " + escapeHtml(r.rr));
+  lines.push("Price: " + money(r.price));
+  lines.push("Buy zone: " + money(r.buyLow) + " to " + money(r.buyHigh));
+
+  return lines.join("<br>");
+}
+
 function canAutoEnter(r, open) {
   var minScore = Number(el("autoMinScore") ? el("autoMinScore").value : 82);
   var minRR = Number(el("autoMinRR") ? el("autoMinRR").value : 1.8);
@@ -1315,12 +1386,24 @@ function shouldAutoExit(position, r) {
 }
 
 function autoPaperCheck() {
+  var decisionLines = [];
+
   if (!AUTO_PAPER) {
+    decisionLines.push("<b>Auto paper is off.</b><br>Turn it on if you want the scanner to paper-enter strong setups.");
+    setAutoDecision(decisionLines.join("<br><br>"));
     return;
   }
 
   var open = getPaperOpen();
   var closed = getPaperClosed();
+  var enteredCount = 0;
+  var exitedCount = 0;
+
+  if (!RESULTS.length) {
+    decisionLines.push("<b>No scanner results.</b><br>Auto paper had nothing to review.");
+    setAutoDecision(decisionLines.join("<br><br>"));
+    return;
+  }
 
   RESULTS.forEach(function (r) {
     var pos = open[r.symbol];
@@ -1356,11 +1439,26 @@ function autoPaperCheck() {
         });
 
         delete open[r.symbol];
+        exitedCount++;
+
+        decisionLines.push(
+          "<b style='color:#ff5577'>" + escapeHtml(r.symbol) + " paper exit</b><br>" +
+          "Reason: " + escapeHtml(exitReason) + "<br>" +
+          "Exit price: " + money(exitPrice) + "<br>" +
+          "P/L: " + money(pnl) + " (" + pnlPct.toFixed(2) + "%)"
+        );
 
         showAlert("Paper exit", r.symbol + " exited at " + money(exitPrice) + ". Reason: " + exitReason, "bad");
         log("AUTO PAPER EXIT: " + r.symbol + " at " + money(exitPrice) + ". " + exitReason);
       } else {
         open[r.symbol] = pos;
+
+        decisionLines.push(
+          "<b>" + escapeHtml(r.symbol) + " already open</b><br>" +
+          "Still holding. No exit rule triggered.<br>" +
+          "Current decision: " + escapeHtml(String(r.decision).replace(/_/g, " ")) + "<br>" +
+          "Score: " + escapeHtml(r.score)
+        );
       }
 
       return;
@@ -1389,13 +1487,36 @@ function autoPaperCheck() {
         lastDecision: r.decision
       };
 
+      enteredCount++;
+
+      decisionLines.push(
+        "<b style='color:#00ff88'>" + escapeHtml(r.symbol) + " paper entry</b><br>" +
+        "Reason: ENTER_NOW passed auto paper rules.<br>" +
+        "Entry: " + money(r.price) + "<br>" +
+        "Stop: " + money(r.stop) + "<br>" +
+        "Target: " + money(r.target) + "<br>" +
+        "Score: " + escapeHtml(r.score) + "<br>" +
+        "R/R: " + escapeHtml(r.rr)
+      );
+
       showAlert("Paper entry", r.symbol + " entered at " + money(r.price) + ". Stop " + money(r.stop) + ". Target " + money(r.target), "");
       log("AUTO PAPER ENTRY: " + r.symbol + " at " + money(r.price));
+      return;
+    }
+
+    if (decisionLines.length < 8) {
+      decisionLines.push(autoRejectReason(r, open));
     }
   });
 
   setPaperOpen(open);
   setPaperClosed(closed);
+
+  if (!enteredCount && !exitedCount && !decisionLines.length) {
+    decisionLines.push("<b>No auto paper action.</b><br>No result met the entry or exit rules.");
+  }
+
+  setAutoDecision(decisionLines.join("<br><br>"));
 }
 
 function addPaper() {
@@ -1446,6 +1567,7 @@ function clearPaper() {
   localStorage.removeItem("paperOpen");
   localStorage.removeItem("paperClosed");
   renderPaper();
+  setAutoDecision("Paper trades and logs cleared.");
   log("Paper trades and log cleared.");
 }
 
@@ -1558,7 +1680,6 @@ function start() {
   el("selfBtn").addEventListener("click", selfTest);
   el("voiceBtn").addEventListener("click", voiceTest);
   el("scanBtn").addEventListener("click", scan);
-  el("discoverBtn").addEventListener("click", discover);
   el("loopBtn").addEventListener("click", toggleLoop);
   el("autoBtn").addEventListener("click", toggleAutoPaper);
   el("addPaperBtn").addEventListener("click", addPaper);
