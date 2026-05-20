@@ -16,9 +16,12 @@
   --green2:#7dffa8;
   --yellow:#ffd166;
   --red:#ff5577;
+  --blue:#57a6ff;
   --gray:#cbd5e1;
 }
+
 *{box-sizing:border-box}
+
 html,body{
   margin:0;
   padding:0;
@@ -28,13 +31,16 @@ html,body{
   color:var(--text);
   font-family:Arial,Helvetica,sans-serif;
 }
+
 body{overflow:auto}
+
 #app{
   width:100%;
   min-height:100vh;
   padding:10px;
   background:radial-gradient(circle at top left,rgba(0,255,136,.13),transparent 420px),#020403;
 }
+
 .card{
   background:var(--card);
   border:1px solid var(--line);
@@ -43,6 +49,7 @@ body{overflow:auto}
   margin-bottom:10px;
   box-shadow:0 0 18px rgba(0,255,136,.05);
 }
+
 .topbar{
   position:sticky;
   top:0;
@@ -58,16 +65,19 @@ body{overflow:auto}
   margin-bottom:10px;
   backdrop-filter:blur(8px);
 }
+
 h1,h2,h3{margin:0 0 8px;color:var(--green2)}
 h1{font-size:23px}
 h2{font-size:14px;text-transform:uppercase}
 h3{font-size:12px;text-transform:uppercase}
+
 p{
   margin:5px 0;
   color:var(--muted);
   font-size:13px;
   line-height:1.4;
 }
+
 label{
   display:block;
   margin:8px 0 4px;
@@ -75,6 +85,7 @@ label{
   font-size:10px;
   text-transform:uppercase;
 }
+
 textarea,input,select{
   width:100%;
   background:#000;
@@ -84,7 +95,12 @@ textarea,input,select{
   padding:8px;
   font-size:12px;
 }
-textarea{min-height:86px;resize:vertical}
+
+textarea{
+  min-height:86px;
+  resize:vertical;
+}
+
 button{
   padding:9px 12px;
   border-radius:9px;
@@ -96,9 +112,11 @@ button{
   text-transform:uppercase;
   font-size:12px;
 }
+
 button:hover{filter:brightness(1.12)}
 button.yellow{background:#211900;color:var(--yellow);border-color:var(--yellow)}
 button.danger{background:#2a0008;color:#ffb8c7;border-color:var(--red)}
+
 button.icon{
   width:42px;
   height:42px;
@@ -106,6 +124,7 @@ button.icon{
   border-radius:50%;
   font-size:20px;
 }
+
 .dot{
   width:12px;
   height:12px;
@@ -115,20 +134,24 @@ button.icon{
   display:inline-block;
   margin-right:6px;
 }
+
 .dot.green{background:var(--green);box-shadow:0 0 14px var(--green)}
 .dot.yellow{background:var(--yellow);box-shadow:0 0 14px var(--yellow)}
+
 .level{
   background:#000;
   border:1px solid rgba(0,255,136,.2);
   border-radius:10px;
   padding:8px;
 }
+
 .level span{
   display:block;
   color:var(--muted);
   font-size:10px;
   text-transform:uppercase;
 }
+
 .level strong{
   display:block;
   color:#fff;
@@ -138,16 +161,54 @@ button.icon{
   overflow:hidden;
   text-overflow:ellipsis;
 }
-.pdt{
-  border-color:rgba(255,209,102,.55);
-}
+
+.pdt{border-color:rgba(255,209,102,.55)}
 .pdt strong{color:var(--yellow)}
+
 .kpis{
   display:grid;
   grid-template-columns:repeat(8,minmax(110px,1fr));
   gap:8px;
   margin-bottom:10px;
 }
+
+.best-strip{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-bottom:10px;
+}
+
+.best-card{
+  background:#000;
+  border:1px solid rgba(0,255,136,.28);
+  border-radius:12px;
+  padding:10px;
+  cursor:pointer;
+}
+
+.best-card:hover{
+  border-color:var(--green);
+  filter:brightness(1.08);
+}
+
+.best-card.enter{border-color:rgba(0,255,136,.65)}
+.best-card.pullback{border-color:rgba(255,209,102,.65)}
+.best-card.breakout{border-color:rgba(87,166,255,.65)}
+
+.best-card strong{
+  display:block;
+  font-size:20px;
+  color:#fff;
+}
+
+.best-card span{
+  display:block;
+  font-size:12px;
+  color:var(--muted);
+  margin-top:4px;
+}
+
 .table-wrap{
   overflow:auto;
   max-height:50vh;
@@ -155,11 +216,13 @@ button.icon{
   border-radius:10px;
   background:#000;
 }
+
 table{
   width:100%;
   border-collapse:collapse;
   min-width:1200px;
 }
+
 th,td{
   border-bottom:1px solid rgba(0,255,136,.15);
   padding:9px;
@@ -167,6 +230,7 @@ th,td{
   text-align:left;
   vertical-align:top;
 }
+
 th{
   position:sticky;
   top:0;
@@ -176,8 +240,15 @@ th{
   text-transform:uppercase;
   z-index:2;
 }
+
 tbody tr{cursor:pointer}
 tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
+
+tr.row-enter{background:rgba(0,255,136,.07)}
+tr.row-pullback{background:rgba(255,209,102,.055)}
+tr.row-breakout{background:rgba(87,166,255,.055)}
+tr.row-watch{background:rgba(156,163,175,.035)}
+
 .badge{
   display:inline-block;
   min-width:112px;
@@ -190,32 +261,49 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
   color:var(--yellow);
   border:1px solid rgba(255,209,102,.4);
 }
+
 .badge.enter{background:rgba(0,255,136,.16);color:var(--green);border-color:rgba(0,255,136,.4)}
 .badge.exit{background:rgba(255,85,119,.16);color:var(--red);border-color:rgba(255,85,119,.4)}
 .badge.avoid{background:rgba(156,163,175,.16);color:var(--gray);border-color:rgba(156,163,175,.4)}
+
+.do-not-chase{
+  display:inline-block;
+  margin-top:5px;
+  border:1px solid rgba(255,85,119,.55);
+  color:#ff9aae;
+  border-radius:999px;
+  padding:3px 8px;
+  font-size:10px;
+  font-weight:800;
+}
+
 .layout{
   display:grid;
   grid-template-columns:minmax(0,1fr) minmax(440px,.75fr);
   gap:10px;
 }
+
 .grid4{
   display:grid;
   grid-template-columns:repeat(4,1fr);
   gap:8px;
   margin-bottom:10px;
 }
+
 .paper-wide{
   display:grid;
   grid-template-columns:repeat(8,minmax(110px,1fr));
   gap:8px;
   margin-bottom:10px;
 }
+
 .paper-row{
   display:grid;
   grid-template-columns:1.2fr .9fr .8fr auto auto auto;
   gap:8px;
   align-items:end;
 }
+
 .note{
   background:#000;
   border:1px solid rgba(0,255,136,.2);
@@ -225,7 +313,15 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
   line-height:1.5;
   margin-top:8px;
 }
+
 .warn{border-color:rgba(255,85,119,.45)}
+
+.wake-warning{
+  display:none;
+  border-color:rgba(255,209,102,.65);
+  color:var(--yellow);
+}
+
 #chart{
   width:100%;
   height:720px;
@@ -234,6 +330,7 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
   border:1px solid var(--green);
   border-radius:12px;
 }
+
 .holding{
   background:#000;
   border:1px solid rgba(0,255,136,.2);
@@ -243,8 +340,24 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
   font-size:12px;
   line-height:1.45;
 }
+
 .holding.bad{border-color:rgba(255,85,119,.55)}
 .holding.good{border-color:rgba(0,255,136,.55)}
+
+.activity-feed{
+  max-height:220px;
+  overflow:auto;
+}
+
+.feed-item{
+  border-bottom:1px solid rgba(0,255,136,.12);
+  padding:7px 0;
+  font-size:12px;
+  color:var(--muted);
+}
+
+.feed-item b{color:#fff}
+
 .log{
   white-space:pre-wrap;
   background:#000;
@@ -255,6 +368,7 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
   max-height:180px;
   overflow:auto;
 }
+
 .alert{
   position:fixed;
   right:18px;
@@ -269,23 +383,28 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
   box-shadow:0 0 32px rgba(0,255,136,.25);
   line-height:1.45;
 }
+
 .alert.bad{border-color:var(--red)}
 .alert.warn{border-color:var(--yellow)}
+
 details summary{
   cursor:pointer;
   color:var(--green2);
   font-weight:800;
   text-transform:uppercase;
 }
+
 .bottom-grid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:10px;
 }
+
 @media(max-width:1200px){
-  .topbar,.kpis,.paper-wide,.paper-row,.layout,.bottom-grid,.grid4{
+  .topbar,.kpis,.paper-wide,.paper-row,.layout,.bottom-grid,.grid4,.best-strip{
     grid-template-columns:1fr;
   }
+
   #chart{height:460px}
   table{min-width:1000px}
 }
@@ -324,8 +443,20 @@ details summary{
   </section>
 
   <div class="card">
+    <h2>Best Trades Right Now</h2>
+    <p>These are the highest-ranked trades from the same sorted list below. Best is first, then working down.</p>
+    <div id="wakeWarning" class="note wake-warning"></div>
+    <div id="bestTrades" class="best-strip">
+      <div class="best-card"><strong>-</strong><span>Waiting for scan.</span></div>
+      <div class="best-card"><strong>-</strong><span>Waiting for scan.</span></div>
+      <div class="best-card"><strong>-</strong><span>Waiting for scan.</span></div>
+    </div>
+    <div id="marketHealthBox" class="note">Market health loading.</div>
+  </div>
+
+  <div class="card">
     <h2>Ranked Signals</h2>
-    <p>Auto-scans your watchlist and expanded discovery universe. Built for swing trades because the account is under $25k.</p>
+    <p>Auto-scans your watchlist and expanded discovery universe. Best trades are sorted from top to bottom.</p>
     <div class="table-wrap">
       <table>
         <thead>
@@ -401,6 +532,13 @@ details summary{
     </div>
   </div>
 
+  <div class="card">
+    <h2>Auto Paper Activity Feed</h2>
+    <div id="activityFeed" class="activity-feed">
+      <div class="feed-item">Waiting for scanner activity.</div>
+    </div>
+  </div>
+
   <div class="layout">
     <div class="card">
       <h2>Open Paper Positions</h2>
@@ -417,6 +555,7 @@ details summary{
   <div class="bottom-grid">
     <details class="card">
       <summary>Scanner Settings</summary>
+
       <label>Mode</label>
       <select id="mode">
         <option value="swing" selected>PDT-safe Swing</option>
@@ -489,6 +628,8 @@ var NEXT_SCAN = 0;
 var TIMER = null;
 var KEEP_TIMER = null;
 var ALERT_TIMER = null;
+var MARKET_HEALTH = "Unknown";
+var LAST_ACTIVE_TIME = Date.now();
 
 var SCANNER_RUNNING = localStorage.getItem("scannerRunning") !== "false";
 var AUTO_PAPER = localStorage.getItem("autoPaperOn") !== "false";
@@ -516,18 +657,25 @@ function parseDateSafe(value){
 function sameToday(value){
   var d = parseDateSafe(value);
   if(!d)return false;
+
   var n = new Date();
-  return d.getFullYear()===n.getFullYear() && d.getMonth()===n.getMonth() && d.getDate()===n.getDate();
+
+  return d.getFullYear()===n.getFullYear() &&
+    d.getMonth()===n.getMonth() &&
+    d.getDate()===n.getDate();
 }
 
 function ageText(value){
   var d = parseDateSafe(value);
   if(!d)return "-";
+
   var ms = Date.now() - d.getTime();
   if(ms < 0) ms = 0;
+
   var mins = Math.floor(ms / 60000);
   var hours = Math.floor(mins / 60);
   var days = Math.floor(hours / 24);
+
   if(days > 0)return days+"d "+(hours%24)+"h";
   if(hours > 0)return hours+"h "+(mins%60)+"m";
   return mins+"m";
@@ -556,33 +704,54 @@ function status(message,kind){
 function showAlert(title,message,type){
   var box=el("alertBox");
   if(!box)return;
+
   clearTimeout(ALERT_TIMER);
   box.className="alert "+(type||"");
   box.innerHTML="<b>"+escapeHtml(title)+"</b><br>"+escapeHtml(message);
   box.style.display="block";
-  ALERT_TIMER=setTimeout(function(){box.style.display="none";},10000);
+
+  ALERT_TIMER=setTimeout(function(){
+    box.style.display="none";
+  },10000);
 }
 
 function speak(message){
   try{
     if(MUTED||!VOICE_UNLOCKED)return;
+
     window.speechSynthesis.cancel();
+
     var v=new SpeechSynthesisUtterance(message);
     v.rate=.95;
+
     window.speechSynthesis.speak(v);
-  }catch(error){log("SPEAK ERROR: "+error.message);}
+  }catch(error){
+    log("SPEAK ERROR: "+error.message);
+  }
 }
 
-function unlockVoiceOnce(){VOICE_UNLOCKED=true;}
+function unlockVoiceOnce(){
+  VOICE_UNLOCKED=true;
+}
 
 function apiJson(path){
   var url=API+path;
   log("Fetching: "+url);
+
   return fetch(url,{cache:"no-store",mode:"cors"}).then(function(response){
     return response.text().then(function(text){
       var data={};
-      try{data=text?JSON.parse(text):{};}catch(e){data={raw:text};}
-      if(!response.ok)throw new Error(data.error||data.message||data.detail||"HTTP "+response.status);
+
+      try{
+        data=text?JSON.parse(text):{};
+      }catch(e){
+        data={raw:text};
+      }
+
+      if(!response.ok){
+        throw new Error(data.error||data.message||data.detail||"HTTP "+response.status);
+      }
+
       return data;
     });
   });
@@ -591,13 +760,19 @@ function apiJson(path){
 function getSymbols(){
   var box=el("symbols");
   if(!box)return "";
-  return box.value.split(",").map(function(s){return s.trim().toUpperCase();}).filter(Boolean).join(",");
+
+  return box.value
+    .split(",")
+    .map(function(s){return s.trim().toUpperCase();})
+    .filter(Boolean)
+    .join(",");
 }
 
 function field(item,names){
   for(var i=0;i<names.length;i++){
     if(item[names[i]]!==undefined&&item[names[i]]!==null)return item[names[i]];
   }
+
   return null;
 }
 
@@ -626,46 +801,252 @@ function clean(item){
   };
 }
 
+function shortReason(r){
+  var decision = String(r.decision || "");
+
+  if (/ENTER_NOW/i.test(decision)) {
+    return "Best active entry";
+  }
+
+  if (/PULLBACK/i.test(decision)) {
+    var price = Number(r.price);
+    var high = Number(r.buyHigh);
+
+    if (Number.isFinite(price) && Number.isFinite(high) && price > high) {
+      return "Strong but above buy zone";
+    }
+
+    return "Waiting for safer pullback";
+  }
+
+  if (/BREAKOUT/i.test(decision)) {
+    return "Waiting for breakout";
+  }
+
+  if (Number(r.rr) < 1.8) {
+    return "Risk/reward too low";
+  }
+
+  return "Watch only";
+}
+
+function rowClass(r){
+  var decision = String(r.decision || "");
+
+  if (/ENTER_NOW/i.test(decision)) return "row-enter";
+  if (/PULLBACK/i.test(decision)) return "row-pullback";
+  if (/BREAKOUT/i.test(decision)) return "row-breakout";
+
+  return "row-watch";
+}
+
+function bestCardClass(r){
+  var decision = String(r.decision || "");
+
+  if (/ENTER_NOW/i.test(decision)) return "enter";
+  if (/PULLBACK/i.test(decision)) return "pullback";
+  if (/BREAKOUT/i.test(decision)) return "breakout";
+
+  return "";
+}
+
+function chaseBadge(r){
+  var price = Number(r.price);
+  var buyHigh = Number(r.buyHigh);
+
+  if (Number.isFinite(price) && Number.isFinite(buyHigh) && buyHigh > 0) {
+    var above = ((price - buyHigh) / buyHigh) * 100;
+
+    if (above > 0.5) {
+      return "<span class='do-not-chase'>DO NOT CHASE</span>";
+    }
+  }
+
+  return "";
+}
+
+function addActivity(text){
+  var items = [];
+
+  try {
+    items = JSON.parse(localStorage.getItem("activityFeed") || "[]");
+  } catch(e) {
+    items = [];
+  }
+
+  items.unshift({
+    time: new Date().toLocaleTimeString(),
+    text: text
+  });
+
+  items = items.slice(0, 60);
+
+  localStorage.setItem("activityFeed", JSON.stringify(items));
+  renderActivity();
+}
+
+function renderActivity(){
+  var box = el("activityFeed");
+  if (!box) return;
+
+  var items = [];
+
+  try {
+    items = JSON.parse(localStorage.getItem("activityFeed") || "[]");
+  } catch(e) {
+    items = [];
+  }
+
+  if (!items.length) {
+    box.innerHTML = "<div class='feed-item'>Waiting for scanner activity.</div>";
+    return;
+  }
+
+  box.innerHTML = items.map(function(item){
+    return "<div class='feed-item'><b>" + escapeHtml(item.time) + "</b> - " + escapeHtml(item.text) + "</div>";
+  }).join("");
+}
+
+function renderBestTrades(){
+  var box = el("bestTrades");
+  if (!box) return;
+
+  var top = RESULTS.slice(0, 3);
+
+  if (!top.length) {
+    box.innerHTML =
+      "<div class='best-card'><strong>-</strong><span>Waiting for scan.</span></div>" +
+      "<div class='best-card'><strong>-</strong><span>Waiting for scan.</span></div>" +
+      "<div class='best-card'><strong>-</strong><span>Waiting for scan.</span></div>";
+    return;
+  }
+
+  box.innerHTML = top.map(function(r, i){
+    return "<div class='best-card " + bestCardClass(r) + "' data-best-index='" + i + "'>" +
+      "<strong>" + (i + 1) + ". " + escapeHtml(r.symbol) + "</strong>" +
+      "<span>" + escapeHtml(String(r.decision).replace(/_/g, " ")) + "</span>" +
+      "<span>Entry score: " + escapeHtml(r.entryScore || r.score) + " | Strength: " + escapeHtml(r.strengthScore || "-") + "</span>" +
+      "<span>" + escapeHtml(shortReason(r)) + "</span>" +
+      chaseBadge(r) +
+    "</div>";
+  }).join("");
+
+  document.querySelectorAll("[data-best-index]").forEach(function(card){
+    card.addEventListener("click", function(){
+      selectTrade(Number(card.getAttribute("data-best-index")), true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  });
+}
+
+function renderMarketHealth(){
+  var box = el("marketHealthBox");
+  if (!box) return;
+
+  var entries = RESULTS.filter(function(r){
+    return /ENTER_NOW/i.test(String(r.decision));
+  }).length;
+
+  var pullbacks = RESULTS.filter(function(r){
+    return /PULLBACK/i.test(String(r.decision));
+  }).length;
+
+  var breakouts = RESULTS.filter(function(r){
+    return /BREAKOUT/i.test(String(r.decision));
+  }).length;
+
+  var text = "<b>Market health:</b> " + escapeHtml(MARKET_HEALTH) + "<br>" +
+    "ENTER_NOW: " + entries + " | Pullbacks: " + pullbacks + " | Breakout watches: " + breakouts + "<br>";
+
+  if (MARKET_HEALTH !== "Bullish") {
+    text += "<span style='color:#ffd166'>Market is not strongly bullish, so auto paper should be more selective.</span>";
+  } else {
+    text += "<span style='color:#00ff88'>Market is supportive for long swing setups, but PDT-safe rules still apply.</span>";
+  }
+
+  box.innerHTML = text;
+}
+
+function checkWakeGap(){
+  var now = Date.now();
+  var gap = now - LAST_ACTIVE_TIME;
+  LAST_ACTIVE_TIME = now;
+
+  if (gap > 10 * 60000) {
+    var mins = Math.round(gap / 60000);
+    var box = el("wakeWarning");
+
+    if (box) {
+      box.style.display = "block";
+      box.innerHTML = "<b>Scanner resumed after " + mins + " minutes inactive.</b><br>Run fresh scan before trusting older prices.";
+    }
+
+    addActivity("Scanner resumed after " + mins + " minutes inactive. Fresh scan recommended.");
+  }
+}
+
 function defaultAccount(){
-  return{starting:5000,cash:5000,open:{},closed:[],createdAt:nowText()};
+  return{
+    starting:5000,
+    cash:5000,
+    open:{},
+    closed:[],
+    createdAt:nowText()
+  };
 }
 
 function getAccount(){
   try{
     var account=JSON.parse(localStorage.getItem("paperAccount")||"null");
+
     if(!account||typeof account!=="object")return defaultAccount();
     if(!account.open)account.open={};
     if(!Array.isArray(account.closed))account.closed=[];
     if(!Number.isFinite(Number(account.starting)))account.starting=5000;
     if(!Number.isFinite(Number(account.cash)))account.cash=account.starting;
+
     return account;
-  }catch(e){return defaultAccount();}
+  }catch(e){
+    return defaultAccount();
+  }
 }
 
-function saveAccount(account){localStorage.setItem("paperAccount",JSON.stringify(account));}
+function saveAccount(account){
+  localStorage.setItem("paperAccount",JSON.stringify(account));
+}
 
 function getOpenValue(account){
-  var value=0,open=account.open||{};
+  var value=0;
+  var open=account.open||{};
+
   Object.keys(open).forEach(function(sym){
     var p=open[sym];
     value+=Number(p.shares||0)*Number(p.lastPrice||p.entry||0);
   });
+
   return value;
 }
 
-function getEquity(account){return Number(account.cash||0)+getOpenValue(account);}
+function getEquity(account){
+  return Number(account.cash||0)+getOpenValue(account);
+}
 
 function getUnrealised(account){
-  var value=0,open=account.open||{};
+  var value=0;
+  var open=account.open||{};
+
   Object.keys(open).forEach(function(sym){
     var p=open[sym];
     value+=(Number(p.lastPrice||p.entry||0)-Number(p.entry||0))*Number(p.shares||0);
   });
+
   return value;
 }
 
 function getRealised(account){
-  return(account.closed||[]).reduce(function(sum,t){return sum+Number(t.pnl||0);},0);
+  return(account.closed||[]).reduce(function(sum,t){
+    return sum+Number(t.pnl||0);
+  },0);
 }
 
 function getDailyPnl(account){
@@ -714,12 +1095,22 @@ function renderAccount(){
 
 function resetAccount(){
   var size=Number(el("accountSize")?el("accountSize").value:5000);
+
   if(!Number.isFinite(size)||size<100)size=5000;
-  saveAccount({starting:size,cash:size,open:{},closed:[],createdAt:nowText()});
+
+  saveAccount({
+    starting:size,
+    cash:size,
+    open:{},
+    closed:[],
+    createdAt:nowText()
+  });
+
   renderPaper();
   renderAccount();
   setAutoDecision("Paper account reset to "+money(size)+".");
   showAlert("Paper account reset","New starting balance is "+money(size),"warn");
+  addActivity("Paper account reset to "+money(size)+".");
 }
 
 function selfCheck(){
@@ -737,7 +1128,11 @@ function keepAlive(){
   apiJson("/api/keepalive").then(function(data){
     setText("keepalive","OK "+(data.version||""));
   }).catch(function(){
-    apiJson("/api/health").then(function(){setText("keepalive","OK");}).catch(function(){setText("keepalive","failed");});
+    apiJson("/api/health").then(function(){
+      setText("keepalive","OK");
+    }).catch(function(){
+      setText("keepalive","failed");
+    });
   });
 }
 
@@ -758,10 +1153,12 @@ function scan(){
   var discoverUrl="/api/discover?risk="+encodeURIComponent(risk||"100")+"&limit=20&scanLimit="+encodeURIComponent(scanLimit)+"&exclude="+encodeURIComponent(symbols);
 
   Promise.allSettled([apiJson(scanUrl),apiJson(discoverUrl)]).then(function(results){
-    var allSignals=[],errors=[];
+    var allSignals=[];
+    var errors=[];
 
     if(results[0].status==="fulfilled"){
       var scanData=results[0].value;
+      MARKET_HEALTH = scanData.market || "Unknown";
       allSignals=allSignals.concat(scanData.signals||scanData.results||scanData.data||[]);
     }else{
       errors.push("Watchlist scan failed: "+results[0].reason.message);
@@ -770,6 +1167,7 @@ function scan(){
     if(results[1].status==="fulfilled"){
       var discoverData=results[1].value;
       allSignals=allSignals.concat(discoverData.signals||discoverData.results||discoverData.data||[]);
+
       if(discoverData.discoveryScanned){
         setText("discoveryText",discoverData.discoveryScanned+" / "+discoverData.discoveryUniverse);
       }
@@ -777,18 +1175,28 @@ function scan(){
       errors.push("Discovery scan failed: "+results[1].reason.message);
     }
 
-    var seen={},cleanList=[];
+    var seen={};
+    var cleanList=[];
+
     allSignals.forEach(function(item){
       var r=clean(item);
+
       if(!r.symbol||r.symbol==="-")return;
+
       if(seen[r.symbol]){
-        if(Number(r.rank||r.score||0)>Number(seen[r.symbol].rank||seen[r.symbol].score||0))seen[r.symbol]=r;
+        if(Number(r.rank||r.score||0)>Number(seen[r.symbol].rank||seen[r.symbol].score||0)){
+          seen[r.symbol]=r;
+        }
+
         return;
       }
+
       seen[r.symbol]=r;
     });
 
-    Object.keys(seen).forEach(function(symbol){cleanList.push(seen[symbol]);});
+    Object.keys(seen).forEach(function(symbol){
+      cleanList.push(seen[symbol]);
+    });
 
     RESULTS=cleanList.filter(function(r){
       return Number(r.score||0)>=58&&!/AVOID/i.test(String(r.decision));
@@ -799,6 +1207,7 @@ function scan(){
     renderRows();
 
     var t=new Date().toLocaleTimeString();
+
     setText("updated",t);
     setText("signalCount",RESULTS.length);
     setText("topSignal",RESULTS[0]?RESULTS[0].symbol:"-");
@@ -815,6 +1224,8 @@ function scan(){
     autoPaperCheck();
     renderPaper();
     renderAccount();
+    renderBestTrades();
+    renderMarketHealth();
     scheduleLoop();
   }).catch(function(error){
     status("Scan failed: "+error.message,"bad");
@@ -830,14 +1241,17 @@ function renderRows(){
 
   if(!RESULTS.length){
     tbody.innerHTML='<tr><td colspan="10" style="text-align:center;padding:20px;color:#9fe9ba">No results returned.</td></tr>';
+    renderBestTrades();
+    renderMarketHealth();
     return;
   }
 
   tbody.innerHTML=RESULTS.map(function(r,i){
     var cls=/ENTER|BUY|ENTRY/i.test(String(r.decision))?"badge enter":/EXIT|SELL|TRIM/i.test(String(r.decision))?"badge exit":/AVOID/i.test(String(r.decision))?"badge avoid":"badge";
-    return '<tr data-index="'+i+'">'+
+
+    return '<tr class="' + rowClass(r) + '" data-index="'+i+'">'+
       '<td><b>'+escapeHtml(r.symbol)+'</b></td>'+
-      '<td><span class="'+cls+'">'+escapeHtml(String(r.decision).replace(/_/g," "))+'</span></td>'+
+      '<td><span class="'+cls+'">'+escapeHtml(String(r.decision).replace(/_/g," "))+'</span><br>'+chaseBadge(r)+'</td>'+
       '<td>'+escapeHtml(r.entryScore||r.score)+'</td>'+
       '<td>'+escapeHtml(r.strengthScore||"-")+'</td>'+
       '<td>'+money(r.price)+'</td>'+
@@ -845,13 +1259,18 @@ function renderRows(){
       '<td>'+money(r.stop)+'</td>'+
       '<td>'+money(r.target)+'</td>'+
       '<td>'+escapeHtml(r.rr)+'</td>'+
-      '<td>'+escapeHtml(r.summary)+'</td>'+
+      '<td>'+escapeHtml(shortReason(r))+'<br><span style="color:#9fe9ba">'+escapeHtml(r.summary)+'</span></td>'+
       '</tr>';
   }).join("");
 
   document.querySelectorAll("#rows tr[data-index]").forEach(function(row){
-    row.addEventListener("click",function(){selectTrade(Number(row.getAttribute("data-index")),true);});
+    row.addEventListener("click",function(){
+      selectTrade(Number(row.getAttribute("data-index")),true);
+    });
   });
+
+  renderBestTrades();
+  renderMarketHealth();
 }
 
 function selectTrade(index,speakIt){
@@ -860,7 +1279,10 @@ function selectTrade(index,speakIt){
 
   SELECTED=r;
 
-  document.querySelectorAll("#rows tr").forEach(function(row){row.classList.remove("selected");});
+  document.querySelectorAll("#rows tr").forEach(function(row){
+    row.classList.remove("selected");
+  });
+
   var active=document.querySelector('#rows tr[data-index="'+index+'"]');
   if(active)active.classList.add("selected");
 
@@ -870,14 +1292,28 @@ function selectTrade(index,speakIt){
   setText("dStop",money(r.stop));
   setText("dTarget",money(r.target));
 
-  var reasons=r.reasons.length?r.reasons.map(function(x){return "- "+escapeHtml(x);}).join("<br>"):"No detailed reasons returned.";
-  var warns=r.warnings.length?r.warnings.map(function(x){return "- "+escapeHtml(x);}).join("<br>"):"No major warnings returned.";
+  var reasons=r.reasons.length?r.reasons.map(function(x){
+    return "- "+escapeHtml(x);
+  }).join("<br>"):"No detailed reasons returned.";
+
+  var warns=r.warnings.length?r.warnings.map(function(x){
+    return "- "+escapeHtml(x);
+  }).join("<br>"):"No major warnings returned.";
+
+  var chase = chaseBadge(r);
 
   el("details").innerHTML=
     "<h2>"+escapeHtml(r.symbol)+" - "+escapeHtml(String(r.decision).replace(/_/g," "))+"</h2>"+
+    "<p><b>Short reason:</b> "+escapeHtml(shortReason(r))+" "+chase+"</p>"+
     "<p><b>Entry score:</b> "+escapeHtml(r.entryScore||r.score)+" | <b>Strength score:</b> "+escapeHtml(r.strengthScore||"-")+"</p>"+
     "<p><b>Action:</b> "+escapeHtml(r.plan)+"</p>"+
-    "<p><b>Reason:</b> "+escapeHtml(r.summary)+"</p>";
+    "<p><b>Reason:</b> "+escapeHtml(r.summary)+"</p>"+
+    "<p><b>Trade plan:</b><br>"+
+    "Entry only around "+money(r.buyLow)+" to "+money(r.buyHigh)+".<br>"+
+    "Stop: "+money(r.stop)+".<br>"+
+    "Target: "+money(r.target)+".<br>"+
+    "Risk/reward: "+escapeHtml(r.rr)+".<br>"+
+    "Do not enter if price is too far above the buy zone.</p>";
 
   el("warnings").innerHTML="<b>Warnings:</b><br>"+warns;
 
@@ -890,7 +1326,9 @@ function selectTrade(index,speakIt){
 
   drawCandlestickChart(r);
 
-  if(speakIt)speak(r.symbol+" selected. Decision "+String(r.decision).replace(/_/g," ")+". Entry score "+(r.entryScore||r.score)+".");
+  if(speakIt){
+    speak(r.symbol+" selected. Decision "+String(r.decision).replace(/_/g," ")+". Entry score "+(r.entryScore||r.score)+".");
+  }
 }
 
 function drawCandlestickChart(r){
@@ -899,11 +1337,14 @@ function drawCandlestickChart(r){
 
   var rect=canvas.getBoundingClientRect();
   var dpr=window.devicePixelRatio||1;
+
   canvas.width=Math.max(1200,Math.floor(rect.width*dpr));
   canvas.height=Math.max(620,Math.floor(rect.height*dpr));
 
   var ctx=canvas.getContext("2d");
-  var w=canvas.width,h=canvas.height;
+  var w=canvas.width;
+  var h=canvas.height;
+
   ctx.clearRect(0,0,w,h);
   ctx.fillStyle="#000";
   ctx.fillRect(0,0,w,h);
@@ -927,24 +1368,45 @@ function drawCandlestickChart(r){
     return;
   }
 
-  bars.forEach(function(b){if(!Number.isFinite(b.open))b.open=b.close;});
+  bars.forEach(function(b){
+    if(!Number.isFinite(b.open))b.open=b.close;
+  });
 
-  var levels=[r.price,r.buyLow,r.buyHigh,r.stop,r.target].map(num).filter(function(v){return Number.isFinite(v);});
+  var levels=[r.price,r.buyLow,r.buyHigh,r.stop,r.target].map(num).filter(function(v){
+    return Number.isFinite(v);
+  });
+
   var vals=[];
-  bars.forEach(function(b){vals.push(b.high,b.low,b.open,b.close);});
-  levels.forEach(function(v){vals.push(v);});
+
+  bars.forEach(function(b){
+    vals.push(b.high,b.low,b.open,b.close);
+  });
+
+  levels.forEach(function(v){
+    vals.push(v);
+  });
 
   var min=Math.min.apply(null,vals)*.992;
   var max=Math.max.apply(null,vals)*1.008;
+
   if(max<=min)max=min+1;
 
-  var left=76*dpr,right=205*dpr,top=42*dpr,bottom=58*dpr;
-  var cw=w-left-right,ch=h-top-bottom;
+  var left=76*dpr;
+  var right=205*dpr;
+  var top=42*dpr;
+  var bottom=58*dpr;
+  var cw=w-left-right;
+  var ch=h-top-bottom;
   var step=cw/Math.max(1,bars.length);
   var bodyW=Math.max(6*dpr,Math.min(17*dpr,step*.72));
 
-  function xFor(i){return left+step*i+step/2;}
-  function yFor(v){return top+ch-((v-min)/(max-min))*ch;}
+  function xFor(i){
+    return left+step*i+step/2;
+  }
+
+  function yFor(v){
+    return top+ch-((v-min)/(max-min))*ch;
+  }
 
   ctx.strokeStyle="rgba(0,255,136,.12)";
   ctx.lineWidth=dpr;
@@ -954,6 +1416,7 @@ function drawCandlestickChart(r){
   for(var g=0;g<=6;g++){
     var gy=top+ch*g/6;
     var priceLabel=max-(max-min)*g/6;
+
     ctx.beginPath();
     ctx.moveTo(left,gy);
     ctx.lineTo(w-right,gy);
@@ -964,8 +1427,10 @@ function drawCandlestickChart(r){
   if(Number.isFinite(num(r.buyLow))&&Number.isFinite(num(r.buyHigh))){
     var y1=yFor(Math.max(num(r.buyLow),num(r.buyHigh)));
     var y2=yFor(Math.min(num(r.buyLow),num(r.buyHigh)));
+
     ctx.fillStyle="rgba(0,255,136,.11)";
     ctx.fillRect(left,y1,cw,Math.max(5*dpr,y2-y1));
+
     ctx.fillStyle="rgba(0,255,136,.6)";
     ctx.font="bold "+(14*dpr)+"px Arial";
     ctx.fillText("BUY ZONE",left+12*dpr,y1+22*dpr);
@@ -973,7 +1438,10 @@ function drawCandlestickChart(r){
 
   bars.forEach(function(b,i){
     var x=xFor(i);
-    var yHigh=yFor(b.high),yLow=yFor(b.low),yOpen=yFor(b.open),yClose=yFor(b.close);
+    var yHigh=yFor(b.high);
+    var yLow=yFor(b.low);
+    var yOpen=yFor(b.open);
+    var yClose=yFor(b.close);
     var bullish=b.close>=b.open;
     var color=bullish?"#00ff88":"#ff5577";
     var topBody=Math.min(yOpen,yClose);
@@ -993,7 +1461,9 @@ function drawCandlestickChart(r){
   function levelLine(v,c,label){
     v=num(v);
     if(!Number.isFinite(v))return;
+
     var y=yFor(v);
+
     ctx.strokeStyle=c;
     ctx.lineWidth=2.2*dpr;
     ctx.setLineDash([9*dpr,6*dpr]);
@@ -1002,6 +1472,7 @@ function drawCandlestickChart(r){
     ctx.lineTo(w-right,y);
     ctx.stroke();
     ctx.setLineDash([]);
+
     ctx.fillStyle=c;
     ctx.font="bold "+(15*dpr)+"px Arial";
     ctx.fillText(label,w-right+10*dpr,y-5*dpr);
@@ -1027,23 +1498,32 @@ function marketClock(){
   var now=new Date();
   var ny=new Date(now.toLocaleString("en-US",{timeZone:"America/New_York"}));
   var day=ny.getDay();
-  var open=new Date(ny),close=new Date(ny);
+  var open=new Date(ny);
+  var close=new Date(ny);
+
   open.setHours(9,30,0,0);
   close.setHours(16,0,0,0);
 
   function fmt(ms){
     ms=Math.max(0,ms);
+
     var h=Math.floor(ms/3600000);
     var m=Math.floor((ms%3600000)/60000);
     var s=Math.floor((ms%60000)/1000);
+
     return h+"h "+pad(m)+"m "+pad(s)+"s";
   }
 
   function nextOpen(d){
     var n=new Date(d);
+
     n.setDate(n.getDate()+1);
     n.setHours(9,30,0,0);
-    while(n.getDay()===0||n.getDay()===6)n.setDate(n.getDate()+1);
+
+    while(n.getDay()===0||n.getDay()===6){
+      n.setDate(n.getDate()+1);
+    }
+
     return n;
   }
 
@@ -1051,23 +1531,33 @@ function marketClock(){
     var w=nextOpen(ny);
     return{state:"Closed",countdown:"opens in "+fmt(w-ny)};
   }
+
   if(ny<open)return{state:"Pre-market",countdown:"opens in "+fmt(open-ny)};
   if(ny>=open&&ny<close)return{state:"Open",countdown:"closes in "+fmt(close-ny)};
+
   var n=nextOpen(ny);
   return{state:"After-hours",countdown:"opens in "+fmt(n-ny)};
 }
 
 function updateTimers(){
   var now = new Date();
-  setText("localTime",now.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit", second:"2-digit"}));
+
+  setText("localTime",now.toLocaleTimeString([], {
+    hour:"2-digit",
+    minute:"2-digit",
+    second:"2-digit"
+  }));
 
   var mc=marketClock();
+
   setText("marketState",mc.state);
   setText("marketCountdown",mc.countdown);
 
   if(SCANNER_RUNNING&&NEXT_SCAN){
     var ms=NEXT_SCAN-Date.now();
+
     if(ms<0)ms=0;
+
     setText("nextScan",Math.floor(ms/60000)+":"+pad(Math.floor((ms%60000)/1000)));
   }else{
     setText("nextScan","Paused");
@@ -1085,15 +1575,21 @@ function scheduleLoop(){
   }
 
   var minutes=Number(el("refresh")?el("refresh").value:5);
+
   if(!Number.isFinite(minutes)||minutes<1)minutes=5;
 
   NEXT_SCAN=Date.now()+minutes*60000;
-  LOOP=setTimeout(function(){scan();},minutes*60000);
+
+  LOOP=setTimeout(function(){
+    scan();
+  },minutes*60000);
+
   updateTimers();
 }
 
 function toggleScanner(){
   SCANNER_RUNNING=!SCANNER_RUNNING;
+
   localStorage.setItem("scannerRunning",SCANNER_RUNNING?"true":"false");
   updateRunButtons();
 
@@ -1102,8 +1598,10 @@ function toggleScanner(){
     scan();
   }else{
     if(LOOP)clearTimeout(LOOP);
+
     LOOP=null;
     NEXT_SCAN=0;
+
     status("Scanner paused.","bad");
     updateTimers();
   }
@@ -1111,13 +1609,16 @@ function toggleScanner(){
 
 function updateRunButtons(){
   var btn=el("pauseBtn");
+
   if(btn)btn.textContent=SCANNER_RUNNING?"Pause":"Resume";
 }
 
 function toggleMute(){
   MUTED=!MUTED;
+
   localStorage.setItem("scannerMuted",MUTED?"true":"false");
   updateMuteButton();
+
   if(!MUTED){
     VOICE_UNLOCKED=true;
     speak("Voice alerts on.");
@@ -1126,6 +1627,7 @@ function toggleMute(){
 
 function updateMuteButton(){
   var btn=el("muteBtn");
+
   if(btn){
     btn.textContent=MUTED?"🔇":"🔊";
     btn.title=MUTED?"Muted":"Voice alerts on";
@@ -1134,6 +1636,7 @@ function updateMuteButton(){
 
 function toggleAutoPaper(){
   AUTO_PAPER=!AUTO_PAPER;
+
   localStorage.setItem("autoPaperOn",AUTO_PAPER?"true":"false");
   updateAutoState();
   updateAutoRules();
@@ -1142,7 +1645,9 @@ function toggleAutoPaper(){
 function updateAutoState(){
   setText("autoState",AUTO_PAPER?"On":"Off");
   setText("topAuto",AUTO_PAPER?"On":"Off");
+
   var btn=el("autoBtn");
+
   if(btn)btn.textContent=AUTO_PAPER?"Turn Auto Paper Off":"Turn Auto Paper On";
 }
 
@@ -1153,6 +1658,7 @@ function updateAutoRules(){
   var maxOpen=el("maxOpenTrades")?el("maxOpenTrades").value:"5";
   var maxDaily=el("maxDailyEntries")?el("maxDailyEntries").value:"3";
   var box=el("autoRulesBox");
+
   if(!box)return;
 
   box.innerHTML=
@@ -1171,6 +1677,7 @@ function updateAutoRules(){
 
 function setAutoDecision(html){
   var box=el("autoDecisionBox");
+
   if(box)box.innerHTML=html;
 }
 
@@ -1253,7 +1760,7 @@ function autoPaperCheck(){
     return;
   }
 
-  RESULTS.forEach(function(r){
+  RESULTS.forEach(function(r,i){
     var pos=account.open[r.symbol];
 
     if(pos){
@@ -1273,6 +1780,7 @@ function autoPaperCheck(){
         var pnlPct=(pnl/cost)*100;
 
         account.cash+=proceeds;
+
         account.closed.unshift({
           symbol:pos.symbol,
           entry:entryPrice,
@@ -1295,15 +1803,21 @@ function autoPaperCheck(){
         decisionLines.push("<b style='color:#ff5577'>"+escapeHtml(r.symbol)+" paper exit</b><br>Reason: "+escapeHtml(exitReason)+"<br>P/L: "+money(pnl)+" ("+pnlPct.toFixed(2)+"%)");
         showAlert("Paper exit",r.symbol+" exited. Reason: "+exitReason,"bad");
         speak("Paper trade exited. "+r.symbol+". Reason "+exitReason+".");
+        addActivity(r.symbol + " exited. Reason: " + exitReason + ". P/L " + money(pnl) + ".");
       }else{
         account.open[r.symbol]=pos;
-        if(decisionLines.length<8)decisionLines.push("<b>"+escapeHtml(r.symbol)+" already open</b><br>Still holding. Age: "+ageText(pos.entryTime)+". No exit rule triggered.");
+
+        if(decisionLines.length<8){
+          decisionLines.push("<b>"+escapeHtml(r.symbol)+" already open</b><br>Still holding. Age: "+ageText(pos.entryTime)+". No exit rule triggered.");
+        }
       }
+
       return;
     }
 
     if(canAutoEnter(r,account)){
       var maxPct=Number(el("maxTradePct")?el("maxTradePct").value:20);
+
       if(!Number.isFinite(maxPct)||maxPct<=0)maxPct=20;
 
       var equity=getEquity(account);
@@ -1313,12 +1827,16 @@ function autoPaperCheck(){
       var shares=Math.floor(budget/price);
 
       if(shares<1){
-        if(decisionLines.length<8)decisionLines.push("<b>"+escapeHtml(r.symbol)+" not entered</b><br>Reason: not enough available cash for one share.");
+        if(decisionLines.length<8){
+          decisionLines.push("<b>"+escapeHtml(r.symbol)+" not entered</b><br>Reason: not enough available cash for one share.");
+        }
+
         return;
       }
 
       var cost=shares*price;
       account.cash-=cost;
+
       account.open[r.symbol]={
         symbol:r.symbol,
         entry:price,
@@ -1342,10 +1860,17 @@ function autoPaperCheck(){
       decisionLines.push("<b style='color:#00ff88'>"+escapeHtml(r.symbol)+" paper entry</b><br>Entry: "+money(price)+"<br>Shares: "+shares+"<br>Cost: "+money(cost)+"<br>Stop: "+money(r.stop)+"<br>Target: "+money(r.target));
       showAlert("Paper entry",r.symbol+" entered at "+money(price)+". Shares "+shares,"");
       speak("Paper trade entered. "+r.symbol+" at "+money(price)+".");
+      addActivity(r.symbol + " entered. Entry " + money(price) + ", shares " + shares + ", score " + r.score + ".");
       return;
     }
 
-    if(decisionLines.length<8)decisionLines.push(autoRejectReason(r,account));
+    if(decisionLines.length<8){
+      decisionLines.push(autoRejectReason(r,account));
+
+      if(i < 3){
+        addActivity(r.symbol + " not entered. " + shortReason(r) + ".");
+      }
+    }
   });
 
   saveAccount(account);
@@ -1361,6 +1886,7 @@ function addPaper(){
     showAlert("Paper trade missing info","Add symbol and entry price.","warn");
     return;
   }
+
   if(!Number.isFinite(shares)||shares<=0)shares=1;
 
   var account=getAccount();
@@ -1372,7 +1898,23 @@ function addPaper(){
   }
 
   account.cash-=cost;
-  account.open[sym]={symbol:sym,entry:entry,shares:shares,cost:cost,stop:null,target:null,entryScore:null,entryDecision:"MANUAL",entryTime:nowText(),entryReason:"Manual paper trade",lastPrice:entry,lastScore:null,lastDecision:"MANUAL"};
+
+  account.open[sym]={
+    symbol:sym,
+    entry:entry,
+    shares:shares,
+    cost:cost,
+    stop:null,
+    target:null,
+    entryScore:null,
+    entryDecision:"MANUAL",
+    entryTime:nowText(),
+    entryReason:"Manual paper trade",
+    lastPrice:entry,
+    lastScore:null,
+    lastDecision:"MANUAL"
+  };
+
   saveAccount(account);
 
   el("paperSymbol").value="";
@@ -1382,14 +1924,19 @@ function addPaper(){
   renderPaper();
   renderAccount();
   showAlert("Manual paper trade added",sym+" added at "+money(entry),"");
+  addActivity("Manual paper trade added: " + sym + " at " + money(entry) + ".");
 }
 
 function closePaper(symbol){
   var account=getAccount();
   var pos=account.open[symbol];
+
   if(!pos)return;
 
-  var r=RESULTS.find(function(x){return x.symbol===symbol;});
+  var r=RESULTS.find(function(x){
+    return x.symbol===symbol;
+  });
+
   var exitPrice=r?Number(r.price):Number(pos.lastPrice||pos.entry);
   var entryPrice=Number(pos.entry);
   var shares=Number(pos.shares||1);
@@ -1399,33 +1946,57 @@ function closePaper(symbol){
   var pnlPct=(pnl/cost)*100;
 
   account.cash+=proceeds;
-  account.closed.unshift({symbol:pos.symbol,entry:entryPrice,exit:exitPrice,shares:shares,cost:cost,proceeds:proceeds,pnl:pnl,pnlPct:pnlPct,entryTime:pos.entryTime,exitTime:nowText(),entryReason:pos.entryReason,exitReason:"Manual close",entryScore:pos.entryScore,exitScore:r?r.score:pos.lastScore});
+
+  account.closed.unshift({
+    symbol:pos.symbol,
+    entry:entryPrice,
+    exit:exitPrice,
+    shares:shares,
+    cost:cost,
+    proceeds:proceeds,
+    pnl:pnl,
+    pnlPct:pnlPct,
+    entryTime:pos.entryTime,
+    exitTime:nowText(),
+    entryReason:pos.entryReason,
+    exitReason:"Manual close",
+    entryScore:pos.entryScore,
+    exitScore:r?r.score:pos.lastScore
+  });
+
   delete account.open[symbol];
 
   saveAccount(account);
   renderPaper();
   renderAccount();
+
   showAlert("Manual paper close",symbol+" closed at "+money(exitPrice)+". P/L "+money(pnl),pnl>=0?"":"bad");
+  addActivity(symbol + " manually closed. P/L " + money(pnl) + ".");
 }
 
 function scanPaper(){
   var account=getAccount();
   var keys=Object.keys(account.open||{});
+
   if(!keys.length){
     showAlert("No paper trades","Add or auto-enter a paper trade first.","warn");
     return;
   }
+
   el("symbols").value=keys.join(",");
   scan();
 }
 
 function clearClosedLog(){
   var account=getAccount();
+
   account.closed=[];
+
   saveAccount(account);
   renderPaper();
   renderAccount();
   setAutoDecision("Closed paper trade log cleared. Open paper positions were kept.");
+  addActivity("Closed paper trade log cleared.");
 }
 
 function renderPaper(){
@@ -1437,13 +2008,16 @@ function renderPaper(){
   setText("paperCount",keys.length);
 
   var box=el("paperBox");
+
   if(box){
     if(!keys.length){
       box.innerHTML="<p>No open paper trades yet.</p>";
     }else{
       box.innerHTML=keys.map(function(sym){
         var p=open[sym];
-        var r=RESULTS.find(function(x){return x.symbol===sym;});
+        var r=RESULTS.find(function(x){
+          return x.symbol===sym;
+        });
 
         if(r){
           p.lastPrice=Number(r.price);
@@ -1478,12 +2052,14 @@ function renderPaper(){
   saveAccount(account);
 
   var closedBox=el("closedBox");
+
   if(closedBox){
     if(!closed.length){
       closedBox.innerHTML="<p>No closed trades yet.</p>";
     }else{
       closedBox.innerHTML=closed.slice(0,60).map(function(t){
         var good=Number(t.pnl)>=0;
+
         return "<div class='"+(good?"holding good":"holding bad")+"'>"+
           "<b>"+escapeHtml(t.symbol)+" closed</b><br>"+
           "Entry: "+money(t.entry)+" | Exit: "+money(t.exit)+" | Shares: "+escapeHtml(t.shares)+"<br>"+
@@ -1502,16 +2078,30 @@ function renderPaper(){
 }
 
 function exportLog(){
-  var data={exportedAt:nowText(),account:getAccount(),settings:{autoPaper:AUTO_PAPER,scannerRunning:SCANNER_RUNNING,muted:MUTED,scanLimit:el("scanLimit")?el("scanLimit").value:"100"}};
+  var data={
+    exportedAt:nowText(),
+    account:getAccount(),
+    activityFeed:JSON.parse(localStorage.getItem("activityFeed") || "[]"),
+    settings:{
+      autoPaper:AUTO_PAPER,
+      scannerRunning:SCANNER_RUNNING,
+      muted:MUTED,
+      scanLimit:el("scanLimit")?el("scanLimit").value:"100"
+    }
+  };
+
   var text=JSON.stringify(data,null,2);
   var blob=new Blob([text],{type:"application/json"});
   var url=URL.createObjectURL(blob);
   var a=document.createElement("a");
+
   a.href=url;
   a.download="paper-trade-log.json";
+
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
+
   URL.revokeObjectURL(url);
 }
 
@@ -1529,8 +2119,16 @@ function start(){
 
   ["autoMinScore","autoMinRR","maxTradePct","maxOpenTrades","maxDailyEntries","accountSize","refresh","scanLimit"].forEach(function(id){
     if(el(id)){
-      el(id).addEventListener("input",function(){updateAutoRules();scheduleLoop();});
-      el(id).addEventListener("change",function(){updateAutoRules();if(SCANNER_RUNNING)scan();});
+      el(id).addEventListener("input",function(){
+        updateAutoRules();
+        scheduleLoop();
+      });
+
+      el(id).addEventListener("change",function(){
+        updateAutoRules();
+
+        if(SCANNER_RUNNING)scan();
+      });
     }
   });
 
@@ -1544,27 +2142,43 @@ function start(){
 
   renderPaper();
   renderAccount();
+  renderActivity();
+  renderBestTrades();
+  renderMarketHealth();
   updateTimers();
 
   TIMER=setInterval(updateTimers,1000);
+
   keepAlive();
   KEEP_TIMER=setInterval(keepAlive,240000);
+
   selfCheck();
 
   document.addEventListener("visibilitychange",function(){
     if(!document.hidden){
+      checkWakeGap();
       keepAlive();
-      if(SCANNER_RUNNING)scheduleLoop();
+
+      if(SCANNER_RUNNING){
+        scan();
+      }
     }
   });
 
   window.addEventListener("focus",function(){
+    checkWakeGap();
     keepAlive();
-    if(SCANNER_RUNNING)scheduleLoop();
+
+    if(SCANNER_RUNNING){
+      scan();
+    }
   });
 
-  if(SCANNER_RUNNING)setTimeout(scan,900);
-  else status("Scanner paused.","bad");
+  if(SCANNER_RUNNING){
+    setTimeout(scan,900);
+  }else{
+    status("Scanner paused.","bad");
+  }
 }
 
 if(document.readyState==="loading"){
