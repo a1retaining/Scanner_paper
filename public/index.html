@@ -4,11 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>US Trade Scanner</title>
-
 <style>
 :root{
   --bg:#020403;
-  --panel:#06150d;
   --card:rgba(0,15,8,.96);
   --line:rgba(0,255,136,.34);
   --text:#d8ffe5;
@@ -20,9 +18,7 @@
   --blue:#57a6ff;
   --gray:#cbd5e1;
 }
-
 *{box-sizing:border-box}
-
 html,body{
   margin:0;
   padding:0;
@@ -33,28 +29,24 @@ html,body{
   font-family:Arial,Helvetica,sans-serif;
   overflow:hidden;
 }
-
 #app{
   position:fixed;
   inset:0;
   display:grid;
-  grid-template-columns:300px minmax(0,1fr);
+  grid-template-columns:310px minmax(0,1fr);
   background:radial-gradient(circle at top left,rgba(0,255,136,.13),transparent 380px),#020403;
 }
-
 .side{
   padding:10px;
   background:linear-gradient(180deg,#03110a,#06150d);
   border-right:1px solid var(--line);
   overflow:auto;
 }
-
 .main{
   padding:10px;
   overflow:auto;
   min-width:0;
 }
-
 .card{
   background:var(--card);
   border:1px solid var(--line);
@@ -63,23 +55,40 @@ html,body{
   margin-bottom:10px;
   box-shadow:0 0 18px rgba(0,255,136,.05);
 }
-
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:10px;
+  margin-bottom:10px;
+}
+.top-left{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.top-actions{
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
 h1,h2,h3{
   margin:0 0 8px;
   color:var(--green2);
 }
-
 h1{font-size:24px}
 h2{font-size:14px;text-transform:uppercase}
 h3{font-size:12px;text-transform:uppercase}
-
 p{
   margin:6px 0;
   color:var(--muted);
   font-size:13px;
   line-height:1.45;
 }
-
 label{
   display:block;
   margin:8px 0 4px;
@@ -87,7 +96,6 @@ label{
   font-size:10px;
   text-transform:uppercase;
 }
-
 textarea,input,select{
   width:100%;
   background:#000;
@@ -97,12 +105,10 @@ textarea,input,select{
   padding:8px;
   font-size:12px;
 }
-
 textarea{
   min-height:92px;
   resize:vertical;
 }
-
 button{
   width:100%;
   padding:10px;
@@ -116,66 +122,59 @@ button{
   text-transform:uppercase;
   font-size:12px;
 }
-
 button:hover{filter:brightness(1.12)}
 button.primary{background:var(--green);color:#001a0c;border:0}
 button.yellow{background:#211900;color:var(--yellow);border-color:var(--yellow)}
 button.danger{background:#2a0008;color:#ffb8c7;border-color:var(--red)}
-button.small{width:auto;padding:7px 10px;font-size:11px;margin-right:6px}
-
-.brand{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
+button.small{
+  width:auto;
+  padding:7px 10px;
+  font-size:11px;
+  margin:6px 6px 0 0;
 }
-
+.icon-btn{
+  width:42px;
+  height:42px;
+  margin:0;
+  padding:0;
+  font-size:20px;
+  border-radius:50%;
+}
 .dot{
-  width:14px;
-  height:14px;
+  width:12px;
+  height:12px;
   border-radius:50%;
   background:var(--red);
   box-shadow:0 0 14px var(--red);
+  display:inline-block;
+  margin-right:6px;
 }
-
 .dot.green{
   background:var(--green);
   box-shadow:0 0 14px var(--green);
 }
-
 .dot.yellow{
   background:var(--yellow);
   box-shadow:0 0 14px var(--yellow);
 }
-
-.top{
-  display:flex;
-  justify-content:space-between;
-  gap:12px;
-  align-items:flex-end;
-}
-
 .kpis{
   display:grid;
   grid-template-columns:repeat(6,minmax(110px,1fr));
   gap:8px;
   margin-bottom:10px;
 }
-
 .kpi{
   background:var(--card);
   border:1px solid var(--line);
   border-radius:10px;
   padding:8px;
 }
-
 .kpi span{
   display:block;
   color:var(--muted);
   font-size:10px;
   text-transform:uppercase;
 }
-
 .kpi strong{
   display:block;
   margin-top:4px;
@@ -185,7 +184,6 @@ button.small{width:auto;padding:7px 10px;font-size:11px;margin-right:6px}
   overflow:hidden;
   text-overflow:ellipsis;
 }
-
 .table-wrap{
   overflow:auto;
   max-height:42vh;
@@ -193,13 +191,11 @@ button.small{width:auto;padding:7px 10px;font-size:11px;margin-right:6px}
   border-radius:10px;
   background:#000;
 }
-
 table{
   width:100%;
   border-collapse:collapse;
   min-width:1180px;
 }
-
 th,td{
   border-bottom:1px solid rgba(0,255,136,.15);
   padding:9px;
@@ -207,7 +203,6 @@ th,td{
   text-align:left;
   vertical-align:top;
 }
-
 th{
   position:sticky;
   top:0;
@@ -217,10 +212,8 @@ th{
   text-transform:uppercase;
   z-index:2;
 }
-
 tbody tr{cursor:pointer}
 tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
-
 .badge{
   display:inline-block;
   min-width:112px;
@@ -233,60 +226,51 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
   color:var(--yellow);
   border:1px solid rgba(255,209,102,.4);
 }
-
 .badge.enter{
   background:rgba(0,255,136,.16);
   color:var(--green);
   border-color:rgba(0,255,136,.4);
 }
-
 .badge.exit{
   background:rgba(255,85,119,.16);
   color:var(--red);
   border-color:rgba(255,85,119,.4);
 }
-
 .badge.avoid{
   background:rgba(156,163,175,.16);
   color:var(--gray);
   border-color:rgba(156,163,175,.4);
 }
-
 .grid4{
   display:grid;
   grid-template-columns:repeat(4,1fr);
   gap:8px;
   margin-bottom:10px;
 }
-
 .grid3{
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:8px;
   margin-bottom:10px;
 }
-
 .level{
   background:#000;
   border:1px solid rgba(0,255,136,.2);
   border-radius:9px;
   padding:9px;
 }
-
 .level span{
   display:block;
   color:var(--muted);
   font-size:10px;
   text-transform:uppercase;
 }
-
 .level strong{
   display:block;
   color:#fff;
   margin-top:4px;
   font-size:14px;
 }
-
 .note{
   background:#000;
   border:1px solid rgba(0,255,136,.2);
@@ -296,18 +280,15 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
   line-height:1.5;
   margin-top:8px;
 }
-
 .warn{border-color:rgba(255,85,119,.45)}
-
 #chart{
   width:100%;
-  height:470px;
+  height:500px;
   display:block;
   background:#000;
   border:1px solid var(--green);
   border-radius:12px;
 }
-
 .log{
   white-space:pre-wrap;
   background:#000;
@@ -318,14 +299,12 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
   max-height:180px;
   overflow:auto;
 }
-
 .paper-row{
   display:grid;
   grid-template-columns:1.2fr .9fr .8fr auto;
   gap:8px;
   align-items:end;
 }
-
 .holding{
   background:#000;
   border:1px solid rgba(0,255,136,.2);
@@ -335,15 +314,8 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
   font-size:12px;
   line-height:1.45;
 }
-
-.holding.bad{
-  border-color:rgba(255,85,119,.55);
-}
-
-.holding.good{
-  border-color:rgba(0,255,136,.55);
-}
-
+.holding.bad{border-color:rgba(255,85,119,.55)}
+.holding.good{border-color:rgba(0,255,136,.55)}
 .alert{
   position:fixed;
   right:18px;
@@ -358,15 +330,12 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
   box-shadow:0 0 32px rgba(0,255,136,.25);
   line-height:1.45;
 }
-
 .alert.bad{border-color:var(--red)}
 .alert.warn{border-color:var(--yellow)}
-
 .footer-note{
   font-size:12px;
   color:var(--muted);
 }
-
 @media(max-width:950px){
   html,body{overflow:auto}
   #app{
@@ -377,7 +346,7 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
   .kpis,.grid4,.grid3,.paper-row{
     grid-template-columns:1fr;
   }
-  #chart{height:340px}
+  #chart{height:360px}
   table{min-width:980px}
 }
 </style>
@@ -386,25 +355,9 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
 <body>
 <div id="app">
   <aside class="side">
-    <div class="card brand">
-      <div>
-        <h2>US Trade Bot</h2>
-        <p>Render full scanner</p>
-      </div>
-      <div id="dot" class="dot"></div>
-    </div>
-
     <div class="card">
-      <h2>Status</h2>
-      <p id="status">Loading JavaScript...</p>
-      <button id="selfBtn" type="button">Self Test</button>
-      <button id="voiceBtn" type="button">Voice Test</button>
-      <button id="scanBtn" class="primary" type="button">Scan Now</button>
-      <button id="loopBtn" type="button">Start Loop</button>
-    </div>
-
-    <div class="card">
-      <h2>Scanner Controls</h2>
+      <h2>Scanner Settings</h2>
+      <p>Auto-start is on. Scan Now checks your watchlist and finds new trades together.</p>
 
       <label>Mode</label>
       <select id="mode">
@@ -412,36 +365,36 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
         <option value="both">Both context</option>
       </select>
 
-      <p>Day trading is avoided. Scan Now checks your watchlist and finds new trades at the same time.</p>
-
       <label>Watchlist</label>
       <textarea id="symbols">SPY,QQQ,NVDA,TSLA,AAPL,MSFT,META,AMD,PLTR,COST,LLY,UNH,JPM,AVGO</textarea>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
         <div>
-          <label>Risk $</label>
-          <input id="risk" type="number" value="100">
-        </div>
-        <div>
           <label>Refresh min</label>
           <input id="refresh" type="number" value="5" min="1">
         </div>
+        <div>
+          <label>Risk $</label>
+          <input id="risk" type="number" value="100">
+        </div>
       </div>
-    </div>
 
-    <div class="card">
-      <h2>Timers</h2>
-      <p>US market: <b id="marketState">Checking...</b></p>
-      <p>Open/close: <b id="marketCountdown">Checking...</b></p>
-      <p>Next scan: <b id="nextScan">Manual only</b></p>
-      <p>Last scan: <b id="lastScan">Not yet</b></p>
-      <p>Keepalive: <b id="keepalive">Starting...</b></p>
+      <button id="scanBtn" class="primary" type="button">Scan Now</button>
     </div>
 
     <div class="card">
       <h2>Auto Paper Trader</h2>
-      <p>Auto paper: <b id="autoState">Off</b></p>
-      <button id="autoBtn" class="yellow" type="button">Turn Auto Paper On</button>
+      <p>Auto paper: <b id="autoState">On</b></p>
+      <button id="autoBtn" class="yellow" type="button">Turn Auto Paper Off</button>
+
+      <label>Paper account size</label>
+      <input id="accountSize" type="number" value="5000" min="100">
+
+      <label>Max one trade %</label>
+      <input id="maxTradePct" type="number" value="20" min="1" max="100">
+
+      <label>Max open trades</label>
+      <input id="maxOpenTrades" type="number" value="5" min="1" max="20">
 
       <label>Minimum score to auto-enter</label>
       <input id="autoMinScore" type="number" value="82" min="50" max="100">
@@ -449,14 +402,21 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
       <label>Minimum risk/reward</label>
       <input id="autoMinRR" type="number" value="1.8" step="0.1">
 
-      <p>Auto enters only strong ENTER_NOW setups. It exits on stop, target, avoid/exit signal, or score breakdown.</p>
+      <button id="resetAccountBtn" class="danger" type="button">Reset $5K Account</button>
+    </div>
+
+    <div class="card">
+      <h2>Timers</h2>
+      <p>US market: <b id="marketState">Checking...</b></p>
+      <p>Open/close: <b id="marketCountdown">Checking...</b></p>
+      <p>Next scan: <b id="nextScan">Checking...</b></p>
+      <p>Last scan: <b id="lastScan">Not yet</b></p>
+      <p>Keepalive: <b id="keepalive">Starting...</b></p>
     </div>
 
     <div class="card">
       <h2>Auto Paper Rules</h2>
-      <div id="autoRulesBox" class="note">
-        Rules loading...
-      </div>
+      <div id="autoRulesBox" class="note">Rules loading...</div>
     </div>
 
     <div class="card">
@@ -487,7 +447,6 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
       <button id="scanPaperBtn" type="button">Scan Paper Trades</button>
       <button id="exportLogBtn" type="button">Export Log</button>
       <button id="clearClosedBtn" type="button">Clear Closed Log</button>
-      <button id="clearPaperBtn" class="danger" type="button">Clear All Paper</button>
     </div>
 
     <div class="card">
@@ -497,12 +456,23 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
   </aside>
 
   <main class="main">
-    <div class="card top">
-      <div>
-        <h1>Trade Decision Dashboard</h1>
-        <p>One scan checks your watchlist and finds new strong trades. Auto paper logs why it enters, waits, or exits.</p>
+    <div class="topbar">
+      <div class="top-left">
+        <h1>US Trade Scanner</h1>
+        <p><span id="statusDot" class="dot"></span><span id="status">Loading scanner...</span></p>
       </div>
-      <p>Selected: <b id="selectedName">-</b></p>
+      <div class="top-actions">
+        <div class="level" style="min-width:130px">
+          <span>Equity</span>
+          <strong id="topEquity">$5,000.00</strong>
+        </div>
+        <div class="level" style="min-width:130px">
+          <span>Auto Paper</span>
+          <strong id="topAuto">On</strong>
+        </div>
+        <button id="muteBtn" class="icon-btn" type="button" title="Mute or unmute">🔊</button>
+        <button id="pauseBtn" class="small yellow" type="button">Pause</button>
+      </div>
     </div>
 
     <section class="kpis">
@@ -512,6 +482,15 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
       <div class="kpi"><span>Signals</span><strong id="signalCount">0</strong></div>
       <div class="kpi"><span>Top</span><strong id="topSignal">-</strong></div>
       <div class="kpi"><span>Open Paper</span><strong id="paperCount">0</strong></div>
+    </section>
+
+    <section class="kpis">
+      <div class="kpi"><span>Cash</span><strong id="cashKpi">$5,000.00</strong></div>
+      <div class="kpi"><span>Open Value</span><strong id="openValueKpi">$0.00</strong></div>
+      <div class="kpi"><span>Realised P/L</span><strong id="realisedKpi">$0.00</strong></div>
+      <div class="kpi"><span>Unrealised P/L</span><strong id="unrealisedKpi">$0.00</strong></div>
+      <div class="kpi"><span>Win Rate</span><strong id="winRateKpi">0%</strong></div>
+      <div class="kpi"><span>Trades Closed</span><strong id="closedCountKpi">0</strong></div>
     </section>
 
     <div class="card">
@@ -535,7 +514,7 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
           </thead>
           <tbody id="rows">
             <tr>
-              <td colspan="10" style="text-align:center;padding:20px;color:#9fe9ba">Click Scan Now.</td>
+              <td colspan="10" style="text-align:center;padding:20px;color:#9fe9ba">Scanner starting...</td>
             </tr>
           </tbody>
         </table>
@@ -544,18 +523,19 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
 
     <div class="card">
       <h2>Selected Trade</h2>
+      <p>Selected: <b id="selectedName">-</b></p>
       <div class="grid4">
         <div class="level"><span>Price</span><strong id="dPrice">-</strong></div>
         <div class="level"><span>Buy Zone</span><strong id="dBuy">-</strong></div>
         <div class="level"><span>Stop</span><strong id="dStop">-</strong></div>
         <div class="level"><span>Target</span><strong id="dTarget">-</strong></div>
       </div>
-      <div id="details" class="note">Click a result after scanning.</div>
+      <div id="details" class="note">Waiting for scanner.</div>
       <div id="warnings" class="note warn">Warnings will show here.</div>
     </div>
 
     <div class="card">
-      <h2>Selected Trade Chart</h2>
+      <h2>Candlestick Chart</h2>
       <p id="chartInfo">Timeframe: backend candle data, usually daily candles.</p>
       <canvas id="chart"></canvas>
     </div>
@@ -573,7 +553,7 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
     <div class="card">
       <h2>Education / Why This Trade</h2>
       <div id="education" class="note">Select a trade to see why the scanner ranked it and what chart signals mattered.</div>
-      <p class="footer-note">Paper-trading tool only. Not financial advice. Always use your own judgment and risk controls.</p>
+      <p class="footer-note">Paper-trading tool only. Not financial advice. Keep the computer awake and the scanner page open for live browser-based monitoring.</p>
     </div>
   </main>
 </div>
@@ -584,13 +564,16 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
 var API = "";
 var RESULTS = [];
 var SELECTED = null;
-var VOICE = false;
 var LOOP = null;
 var NEXT_SCAN = 0;
 var TIMER = null;
 var KEEP_TIMER = null;
 var ALERT_TIMER = null;
-var AUTO_PAPER = localStorage.getItem("autoPaperOn") === "true";
+
+var SCANNER_RUNNING = localStorage.getItem("scannerRunning") !== "false";
+var AUTO_PAPER = localStorage.getItem("autoPaperOn") !== "false";
+var MUTED = localStorage.getItem("scannerMuted") === "true";
+var VOICE_UNLOCKED = false;
 
 function el(id) {
   return document.getElementById(id);
@@ -642,7 +625,7 @@ function status(message, kind) {
   setText("status", message);
   setText("connection", kind === "good" ? "Connected" : kind === "work" ? "Working" : "Offline");
 
-  var d = el("dot");
+  var d = el("statusDot");
   if (d) {
     d.className = "dot";
     if (kind === "good") {
@@ -672,7 +655,7 @@ function showAlert(title, message, type) {
 
 function speak(message) {
   try {
-    if (!VOICE) {
+    if (MUTED || !VOICE_UNLOCKED) {
       return;
     }
 
@@ -685,6 +668,10 @@ function speak(message) {
   } catch (error) {
     log("SPEAK ERROR: " + error.message);
   }
+}
+
+function unlockVoiceOnce() {
+  VOICE_UNLOCKED = true;
 }
 
 function apiJson(path) {
@@ -763,18 +750,128 @@ function clean(item) {
   };
 }
 
-function selfTest() {
-  status("Testing backend...", "work");
+function defaultAccount() {
+  return {
+    starting: 5000,
+    cash: 5000,
+    open: {},
+    closed: [],
+    createdAt: nowText()
+  };
+}
 
+function getAccount() {
+  try {
+    var account = JSON.parse(localStorage.getItem("paperAccount") || "null");
+    if (!account || typeof account !== "object") {
+      return defaultAccount();
+    }
+    if (!account.open) account.open = {};
+    if (!Array.isArray(account.closed)) account.closed = [];
+    if (!Number.isFinite(Number(account.starting))) account.starting = 5000;
+    if (!Number.isFinite(Number(account.cash))) account.cash = account.starting;
+    return account;
+  } catch (e) {
+    return defaultAccount();
+  }
+}
+
+function saveAccount(account) {
+  localStorage.setItem("paperAccount", JSON.stringify(account));
+}
+
+function getEquity(account) {
+  var open = account.open || {};
+  var value = 0;
+
+  Object.keys(open).forEach(function (sym) {
+    var p = open[sym];
+    var now = Number(p.lastPrice || p.entry || 0);
+    value += Number(p.shares || 0) * now;
+  });
+
+  return Number(account.cash || 0) + value;
+}
+
+function getOpenValue(account) {
+  var open = account.open || {};
+  var value = 0;
+
+  Object.keys(open).forEach(function (sym) {
+    var p = open[sym];
+    var now = Number(p.lastPrice || p.entry || 0);
+    value += Number(p.shares || 0) * now;
+  });
+
+  return value;
+}
+
+function getUnrealised(account) {
+  var open = account.open || {};
+  var value = 0;
+
+  Object.keys(open).forEach(function (sym) {
+    var p = open[sym];
+    var now = Number(p.lastPrice || p.entry || 0);
+    var entry = Number(p.entry || 0);
+    value += (now - entry) * Number(p.shares || 0);
+  });
+
+  return value;
+}
+
+function getRealised(account) {
+  return (account.closed || []).reduce(function (sum, t) {
+    return sum + Number(t.pnl || 0);
+  }, 0);
+}
+
+function renderAccount() {
+  var account = getAccount();
+  var closed = account.closed || [];
+  var wins = closed.filter(function (t) { return Number(t.pnl || 0) > 0; }).length;
+  var winRate = closed.length ? (wins / closed.length) * 100 : 0;
+  var equity = getEquity(account);
+
+  setText("topEquity", money(equity));
+  setText("cashKpi", money(account.cash));
+  setText("openValueKpi", money(getOpenValue(account)));
+  setText("realisedKpi", money(getRealised(account)));
+  setText("unrealisedKpi", money(getUnrealised(account)));
+  setText("winRateKpi", winRate.toFixed(1) + "%");
+  setText("closedCountKpi", closed.length);
+  setText("paperCount", Object.keys(account.open || {}).length);
+}
+
+function resetAccount() {
+  var size = Number(el("accountSize") ? el("accountSize").value : 5000);
+  if (!Number.isFinite(size) || size < 100) {
+    size = 5000;
+  }
+
+  var account = {
+    starting: size,
+    cash: size,
+    open: {},
+    closed: [],
+    createdAt: nowText()
+  };
+
+  saveAccount(account);
+  renderPaper();
+  renderAccount();
+  setAutoDecision("Paper account reset to " + money(size) + ".");
+  showAlert("Paper account reset", "New starting balance is " + money(size), "warn");
+}
+
+function selfCheck() {
   apiJson("/api/health")
     .then(function (data) {
-      status("Connected. Backend version " + (data.version || "?"), "good");
-      log("HEALTH OK");
-      setText("marketKpi", data.market || "-");
+      status("Connected. Auto scanner active.", "good");
+      log("HEALTH OK version " + (data.version || "?"));
     })
     .catch(function (error) {
       status("Backend failed: " + error.message, "bad");
-      log("HEALTH ERROR: " + error.message);
       showAlert("Backend failed", error.message, "bad");
     });
 }
@@ -795,26 +892,12 @@ function keepAlive() {
     });
 }
 
-function voiceTest() {
-  VOICE = true;
-
-  try {
-    window.speechSynthesis.cancel();
-
-    var v = new SpeechSynthesisUtterance("Voice test working. Trade alerts will now speak when auto paper enters or exits.");
-    v.rate = 0.95;
-
-    window.speechSynthesis.speak(v);
-
-    status("Voice working. Auto paper voice alerts enabled.", "good");
-    log("VOICE OK");
-  } catch (error) {
-    status("Voice failed: " + error.message, "bad");
-    log("VOICE ERROR: " + error.message);
-  }
-}
-
 function scan() {
+  if (!SCANNER_RUNNING) {
+    status("Scanner paused.", "bad");
+    return;
+  }
+
   status("Scanning watchlist and finding new trades...", "work");
 
   var risk = el("risk") ? el("risk").value : "100";
@@ -904,17 +987,16 @@ function scan() {
         selectTrade(0, false);
       }
 
-      if (RESULTS.length && VOICE) {
-        speak("Top result is " + RESULTS[0].symbol + ". Score " + RESULTS[0].score + ".");
-      }
-
       autoPaperCheck();
       renderPaper();
+      renderAccount();
+      scheduleLoop();
     })
     .catch(function (error) {
       status("Scan failed: " + error.message, "bad");
       log("SCAN ERROR: " + error.message);
       showAlert("Scan failed", error.message, "bad");
+      scheduleLoop();
     });
 }
 
@@ -1007,17 +1089,17 @@ function selectTrade(index, speakIt) {
 
   el("education").innerHTML =
     "<b>Why it ranked:</b><br>" + reasons +
-    "<br><br><b>Entry rule:</b> Auto paper only enters if the backend says ENTER_NOW, score is strong, risk/reward is acceptable, and the ticker is not already open." +
+    "<br><br><b>Entry rule:</b> Auto paper only enters if the backend says ENTER_NOW, score is strong, risk/reward is acceptable, there is enough cash, and the ticker is not already open." +
     "<br><br><b>Exit rule:</b> Auto paper exits if price hits stop, reaches target, the signal becomes AVOID/EXIT/SELL/TRIM, or the score drops below the safety level.";
 
-  drawChart(r);
+  drawCandlestickChart(r);
 
-  if (speakIt && VOICE) {
+  if (speakIt) {
     speak(r.symbol + " selected. Decision " + String(r.decision).replace(/_/g, " ") + ". Score " + r.score + ". Stop " + money(r.stop) + ". Target " + money(r.target) + ".");
   }
 }
 
-function drawChart(r) {
+function drawCandlestickChart(r) {
   var canvas = el("chart");
   if (!canvas) {
     return;
@@ -1027,7 +1109,7 @@ function drawChart(r) {
   var dpr = window.devicePixelRatio || 1;
 
   canvas.width = Math.max(700, Math.floor(rect.width * dpr));
-  canvas.height = Math.max(340, Math.floor(rect.height * dpr));
+  canvas.height = Math.max(360, Math.floor(rect.height * dpr));
 
   var ctx = canvas.getContext("2d");
   var w = canvas.width;
@@ -1039,33 +1121,38 @@ function drawChart(r) {
 
   var bars = r.bars.map(function (b) {
     return {
-      close: num(b.close !== undefined ? b.close : b.c),
+      open: num(b.open !== undefined ? b.open : b.o),
       high: num(b.high !== undefined ? b.high : b.h),
       low: num(b.low !== undefined ? b.low : b.l),
+      close: num(b.close !== undefined ? b.close : b.c),
       date: b.date || ""
     };
   }).filter(function (b) {
-    return Number.isFinite(b.close);
-  }).slice(-150);
+    return Number.isFinite(b.close) && Number.isFinite(b.high) && Number.isFinite(b.low);
+  }).slice(-120);
 
   if (!bars.length) {
     ctx.fillStyle = "#7dffa8";
     ctx.font = (18 * dpr) + "px Arial";
-    ctx.fillText("No chart data returned for this symbol.", 24 * dpr, 42 * dpr);
-    ctx.fillText("The scanner can still use the table values, but the chart needs backend candle data.", 24 * dpr, 74 * dpr);
+    ctx.fillText("No candle data returned for this symbol.", 24 * dpr, 42 * dpr);
+    ctx.fillText("Scanner values still work, but the chart needs backend bars.", 24 * dpr, 74 * dpr);
     return;
   }
+
+  bars.forEach(function (b) {
+    if (!Number.isFinite(b.open)) {
+      b.open = b.close;
+    }
+  });
 
   var levels = [r.price, r.buyLow, r.buyHigh, r.stop, r.target].map(num).filter(function (v) {
     return Number.isFinite(v);
   });
 
   var vals = [];
-
   bars.forEach(function (b) {
-    vals.push(b.close, b.high || b.close, b.low || b.close);
+    vals.push(b.high, b.low, b.open, b.close);
   });
-
   levels.forEach(function (v) {
     vals.push(v);
   });
@@ -1083,9 +1170,11 @@ function drawChart(r) {
   var bottom = 40 * dpr;
   var cw = w - left - right;
   var ch = h - top - bottom;
+  var step = cw / Math.max(1, bars.length);
+  var bodyW = Math.max(3 * dpr, step * 0.62);
 
   function xFor(i) {
-    return left + cw * i / Math.max(1, bars.length - 1);
+    return left + step * i + step / 2;
   }
 
   function yFor(v) {
@@ -1110,22 +1199,27 @@ function drawChart(r) {
     ctx.fillRect(left, y1, cw, Math.max(2 * dpr, y2 - y1));
   }
 
-  ctx.strokeStyle = "#57a6ff";
-  ctx.lineWidth = 2.4 * dpr;
-  ctx.beginPath();
-
   bars.forEach(function (b, i) {
     var x = xFor(i);
-    var y = yFor(b.close);
+    var yHigh = yFor(b.high);
+    var yLow = yFor(b.low);
+    var yOpen = yFor(b.open);
+    var yClose = yFor(b.close);
+    var bullish = b.close >= b.open;
+    var color = bullish ? "#00ff88" : "#ff5577";
+    var topBody = Math.min(yOpen, yClose);
+    var bodyH = Math.max(1.5 * dpr, Math.abs(yOpen - yClose));
 
-    if (i === 0) {
-      ctx.moveTo(x, y);
-    } else {
-      ctx.lineTo(x, y);
-    }
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.2 * dpr;
+    ctx.beginPath();
+    ctx.moveTo(x, yHigh);
+    ctx.lineTo(x, yLow);
+    ctx.stroke();
+
+    ctx.fillStyle = color;
+    ctx.fillRect(x - bodyW / 2, topBody, bodyW, bodyH);
   });
-
-  ctx.stroke();
 
   function line(v, c, label) {
     v = num(v);
@@ -1219,7 +1313,7 @@ function updateTimers() {
   setText("marketState", mc.state);
   setText("marketCountdown", mc.countdown);
 
-  if (LOOP && NEXT_SCAN) {
+  if (SCANNER_RUNNING && NEXT_SCAN) {
     var ms = NEXT_SCAN - Date.now();
     if (ms < 0) {
       ms = 0;
@@ -1227,71 +1321,79 @@ function updateTimers() {
 
     setText("nextScan", Math.floor(ms / 60000) + ":" + pad(Math.floor((ms % 60000) / 1000)));
   } else {
-    setText("nextScan", "Manual only");
+    setText("nextScan", "Paused");
   }
 }
 
-function toggleLoop() {
-  var btn = el("loopBtn");
-
+function scheduleLoop() {
   if (LOOP) {
-    clearInterval(LOOP);
+    clearTimeout(LOOP);
     LOOP = null;
+  }
+
+  if (!SCANNER_RUNNING) {
     NEXT_SCAN = 0;
-
-    if (btn) {
-      btn.textContent = "Start Loop";
-    }
-
-    setText("nextScan", "Manual only");
-    log("Loop stopped.");
+    updateTimers();
     return;
   }
 
   var minutes = Number(el("refresh") ? el("refresh").value : 5);
-
   if (!Number.isFinite(minutes) || minutes < 1) {
     minutes = 5;
   }
 
-  scan();
-
   NEXT_SCAN = Date.now() + minutes * 60000;
 
-  LOOP = setInterval(function () {
-    NEXT_SCAN = Date.now() + minutes * 60000;
+  LOOP = setTimeout(function () {
     scan();
   }, minutes * 60000);
 
+  updateTimers();
+}
+
+function toggleScanner() {
+  SCANNER_RUNNING = !SCANNER_RUNNING;
+  localStorage.setItem("scannerRunning", SCANNER_RUNNING ? "true" : "false");
+  updateRunButtons();
+
+  if (SCANNER_RUNNING) {
+    status("Scanner resumed.", "good");
+    scan();
+  } else {
+    if (LOOP) {
+      clearTimeout(LOOP);
+      LOOP = null;
+    }
+    NEXT_SCAN = 0;
+    status("Scanner paused.", "bad");
+    updateTimers();
+  }
+}
+
+function updateRunButtons() {
+  var btn = el("pauseBtn");
   if (btn) {
-    btn.textContent = "Stop Loop";
-  }
-
-  log("Loop started. Refresh every " + minutes + " minutes.");
-}
-
-function getPaperOpen() {
-  try {
-    return JSON.parse(localStorage.getItem("paperOpen") || "{}");
-  } catch (e) {
-    return {};
+    btn.textContent = SCANNER_RUNNING ? "Pause" : "Resume";
   }
 }
 
-function setPaperOpen(p) {
-  localStorage.setItem("paperOpen", JSON.stringify(p));
-}
+function toggleMute() {
+  MUTED = !MUTED;
+  localStorage.setItem("scannerMuted", MUTED ? "true" : "false");
+  updateMuteButton();
 
-function getPaperClosed() {
-  try {
-    return JSON.parse(localStorage.getItem("paperClosed") || "[]");
-  } catch (e) {
-    return [];
+  if (!MUTED) {
+    VOICE_UNLOCKED = true;
+    speak("Voice alerts on.");
   }
 }
 
-function setPaperClosed(p) {
-  localStorage.setItem("paperClosed", JSON.stringify(p));
+function updateMuteButton() {
+  var btn = el("muteBtn");
+  if (btn) {
+    btn.textContent = MUTED ? "🔇" : "🔊";
+    btn.title = MUTED ? "Muted" : "Voice alerts on";
+  }
 }
 
 function toggleAutoPaper() {
@@ -1304,6 +1406,7 @@ function toggleAutoPaper() {
 
 function updateAutoState() {
   setText("autoState", AUTO_PAPER ? "On" : "Off");
+  setText("topAuto", AUTO_PAPER ? "On" : "Off");
 
   var btn = el("autoBtn");
   if (btn) {
@@ -1314,6 +1417,9 @@ function updateAutoState() {
 function updateAutoRules() {
   var minScore = el("autoMinScore") ? el("autoMinScore").value : "82";
   var minRR = el("autoMinRR") ? el("autoMinRR").value : "1.8";
+  var maxPct = el("maxTradePct") ? el("maxTradePct").value : "20";
+  var maxOpen = el("maxOpenTrades") ? el("maxOpenTrades").value : "5";
+  var accountSize = el("accountSize") ? el("accountSize").value : "5000";
 
   var box = el("autoRulesBox");
   if (!box) {
@@ -1321,20 +1427,24 @@ function updateAutoRules() {
   }
 
   box.innerHTML =
+    "<b>Paper account</b><br>" +
+    "Starting account: " + money(accountSize) + "<br>" +
+    "Max one trade: " + escapeHtml(maxPct) + "% of equity.<br>" +
+    "Max open trades: " + escapeHtml(maxOpen) + ".<br><br>" +
     "<b>Entry rules</b><br>" +
     "1. Auto paper must be ON.<br>" +
     "2. Scanner decision must be ENTER_NOW.<br>" +
     "3. Score must be at least " + escapeHtml(minScore) + ".<br>" +
     "4. Risk/reward must be at least " + escapeHtml(minRR) + ".<br>" +
-    "5. Price, stop, and target must exist.<br>" +
+    "5. Cash must be available.<br>" +
     "6. Ticker must not already be open.<br><br>" +
     "<b>Exit rules</b><br>" +
     "1. Exit if price hits stop.<br>" +
     "2. Exit if price hits target.<br>" +
     "3. Exit if scanner changes to AVOID, EXIT, SELL, or TRIM.<br>" +
     "4. Exit if score falls below 55.<br><br>" +
-    "<b>Voice alerts</b><br>" +
-    "Press Voice Test once. After that, paper entries and exits will speak out loud.";
+    "<b>Keep running</b><br>" +
+    "The scanner keeps running while the page stays open and the computer stays awake.";
 }
 
 function setAutoDecision(html) {
@@ -1344,15 +1454,19 @@ function setAutoDecision(html) {
   }
 }
 
-function autoRejectReason(r, open) {
+function autoRejectReason(r, account) {
   var minScore = Number(el("autoMinScore") ? el("autoMinScore").value : 82);
   var minRR = Number(el("autoMinRR") ? el("autoMinRR").value : 1.8);
+  var maxOpen = Number(el("maxOpenTrades") ? el("maxOpenTrades").value : 5);
+  var open = account.open || {};
   var lines = [];
 
   lines.push("<b>" + escapeHtml(r.symbol) + " not entered</b>");
 
   if (open[r.symbol]) {
     lines.push("Reason: already has an open paper position.");
+  } else if (Object.keys(open).length >= maxOpen) {
+    lines.push("Reason: max open trades reached.");
   } else if (!/ENTER_NOW/i.test(String(r.decision))) {
     lines.push("Reason: scanner says " + escapeHtml(String(r.decision).replace(/_/g, " ")) + ", not ENTER_NOW.");
   } else if (Number(r.score) < minScore) {
@@ -1361,6 +1475,8 @@ function autoRejectReason(r, open) {
     lines.push("Reason: risk/reward " + escapeHtml(r.rr) + " is below minimum " + escapeHtml(minRR) + ".");
   } else if (!Number.isFinite(Number(r.price)) || !Number.isFinite(Number(r.stop)) || !Number.isFinite(Number(r.target))) {
     lines.push("Reason: missing price, stop, or target.");
+  } else if (Number(account.cash) < Number(r.price)) {
+    lines.push("Reason: not enough paper cash.");
   } else {
     lines.push("Reason: passed close review, but no auto action was taken.");
   }
@@ -1374,37 +1490,23 @@ function autoRejectReason(r, open) {
   return lines.join("<br>");
 }
 
-function canAutoEnter(r, open) {
+function canAutoEnter(r, account) {
   var minScore = Number(el("autoMinScore") ? el("autoMinScore").value : 82);
   var minRR = Number(el("autoMinRR") ? el("autoMinRR").value : 1.8);
+  var maxOpen = Number(el("maxOpenTrades") ? el("maxOpenTrades").value : 5);
+  var open = account.open || {};
 
-  if (!Number.isFinite(minScore)) {
-    minScore = 82;
-  }
+  if (!Number.isFinite(minScore)) minScore = 82;
+  if (!Number.isFinite(minRR)) minRR = 1.8;
+  if (!Number.isFinite(maxOpen)) maxOpen = 5;
 
-  if (!Number.isFinite(minRR)) {
-    minRR = 1.8;
-  }
-
-  if (open[r.symbol]) {
-    return false;
-  }
-
-  if (!/ENTER_NOW/i.test(String(r.decision))) {
-    return false;
-  }
-
-  if (Number(r.score) < minScore) {
-    return false;
-  }
-
-  if (Number(r.rr) < minRR) {
-    return false;
-  }
-
-  if (!Number.isFinite(Number(r.price)) || !Number.isFinite(Number(r.stop)) || !Number.isFinite(Number(r.target))) {
-    return false;
-  }
+  if (open[r.symbol]) return false;
+  if (Object.keys(open).length >= maxOpen) return false;
+  if (!/ENTER_NOW/i.test(String(r.decision))) return false;
+  if (Number(r.score) < minScore) return false;
+  if (Number(r.rr) < minRR) return false;
+  if (!Number.isFinite(Number(r.price)) || !Number.isFinite(Number(r.stop)) || !Number.isFinite(Number(r.target))) return false;
+  if (Number(account.cash) < Number(r.price)) return false;
 
   return true;
 }
@@ -1444,8 +1546,7 @@ function autoPaperCheck() {
     return;
   }
 
-  var open = getPaperOpen();
-  var closed = getPaperClosed();
+  var account = getAccount();
   var enteredCount = 0;
   var exitedCount = 0;
 
@@ -1456,10 +1557,10 @@ function autoPaperCheck() {
   }
 
   RESULTS.forEach(function (r) {
-    var pos = open[r.symbol];
+    var pos = account.open[r.symbol];
 
     if (pos) {
-      pos.lastPrice = r.price;
+      pos.lastPrice = Number(r.price);
       pos.lastScore = r.score;
       pos.lastDecision = r.decision;
 
@@ -1469,14 +1570,20 @@ function autoPaperCheck() {
         var exitPrice = Number(r.price);
         var entryPrice = Number(pos.entry);
         var shares = Number(pos.shares || 1);
-        var pnl = (exitPrice - entryPrice) * shares;
-        var pnlPct = ((exitPrice - entryPrice) / entryPrice) * 100;
+        var cost = Number(pos.cost || entryPrice * shares);
+        var proceeds = exitPrice * shares;
+        var pnl = proceeds - cost;
+        var pnlPct = (pnl / cost) * 100;
 
-        closed.unshift({
+        account.cash += proceeds;
+
+        account.closed.unshift({
           symbol: pos.symbol,
           entry: entryPrice,
           exit: exitPrice,
           shares: shares,
+          cost: cost,
+          proceeds: proceeds,
           pnl: pnl,
           pnlPct: pnlPct,
           entryTime: pos.entryTime,
@@ -1488,7 +1595,7 @@ function autoPaperCheck() {
           holdNote: pos.holdNote || ""
         });
 
-        delete open[r.symbol];
+        delete account.open[r.symbol];
         exitedCount++;
 
         decisionLines.push(
@@ -1502,7 +1609,7 @@ function autoPaperCheck() {
         speak("Paper trade exited. " + r.symbol + " at " + money(exitPrice) + ". Reason. " + exitReason + ".");
         log("AUTO PAPER EXIT: " + r.symbol + " at " + money(exitPrice) + ". " + exitReason);
       } else {
-        open[r.symbol] = pos;
+        account.open[r.symbol] = pos;
 
         decisionLines.push(
           "<b>" + escapeHtml(r.symbol) + " already open</b><br>" +
@@ -1515,15 +1622,31 @@ function autoPaperCheck() {
       return;
     }
 
-    if (canAutoEnter(r, open)) {
-      var riskDollars = Number(el("risk") ? el("risk").value : 100);
-      var riskPerShare = Math.max(0.01, Number(r.price) - Number(r.stop));
-      var shares = Math.max(1, Math.floor(riskDollars / riskPerShare));
+    if (canAutoEnter(r, account)) {
+      var maxPct = Number(el("maxTradePct") ? el("maxTradePct").value : 20);
+      if (!Number.isFinite(maxPct) || maxPct <= 0) maxPct = 20;
 
-      open[r.symbol] = {
+      var equity = getEquity(account);
+      var maxTradeValue = equity * (maxPct / 100);
+      var budget = Math.min(Number(account.cash), maxTradeValue);
+      var price = Number(r.price);
+      var shares = Math.floor(budget / price);
+
+      if (shares < 1) {
+        if (decisionLines.length < 8) {
+          decisionLines.push("<b>" + escapeHtml(r.symbol) + " not entered</b><br>Reason: not enough available cash for one share.");
+        }
+        return;
+      }
+
+      var cost = shares * price;
+      account.cash -= cost;
+
+      account.open[r.symbol] = {
         symbol: r.symbol,
-        entry: Number(r.price),
+        entry: price,
         shares: shares,
+        cost: cost,
         stop: Number(r.stop),
         target: Number(r.target),
         target2: Number(r.target2 || r.target),
@@ -1533,7 +1656,7 @@ function autoPaperCheck() {
         entryReason: r.summary,
         actionPlan: r.plan,
         holdNote: r.hold,
-        lastPrice: Number(r.price),
+        lastPrice: price,
         lastScore: Number(r.score),
         lastDecision: r.decision
       };
@@ -1543,26 +1666,27 @@ function autoPaperCheck() {
       decisionLines.push(
         "<b style='color:#00ff88'>" + escapeHtml(r.symbol) + " paper entry</b><br>" +
         "Reason: ENTER_NOW passed auto paper rules.<br>" +
-        "Entry: " + money(r.price) + "<br>" +
+        "Entry: " + money(price) + "<br>" +
+        "Shares: " + shares + "<br>" +
+        "Cost: " + money(cost) + "<br>" +
         "Stop: " + money(r.stop) + "<br>" +
         "Target: " + money(r.target) + "<br>" +
         "Score: " + escapeHtml(r.score) + "<br>" +
         "R/R: " + escapeHtml(r.rr)
       );
 
-      showAlert("Paper entry", r.symbol + " entered at " + money(r.price) + ". Stop " + money(r.stop) + ". Target " + money(r.target), "");
-      speak("Paper trade entered. " + r.symbol + " at " + money(r.price) + ". Stop " + money(r.stop) + ". Target " + money(r.target) + ".");
-      log("AUTO PAPER ENTRY: " + r.symbol + " at " + money(r.price));
+      showAlert("Paper entry", r.symbol + " entered at " + money(price) + ". Shares " + shares + ". Stop " + money(r.stop) + ". Target " + money(r.target), "");
+      speak("Paper trade entered. " + r.symbol + " at " + money(price) + ". Shares " + shares + ". Stop " + money(r.stop) + ". Target " + money(r.target) + ".");
+      log("AUTO PAPER ENTRY: " + r.symbol + " at " + money(price) + ". Shares " + shares);
       return;
     }
 
     if (decisionLines.length < 8) {
-      decisionLines.push(autoRejectReason(r, open));
+      decisionLines.push(autoRejectReason(r, account));
     }
   });
 
-  setPaperOpen(open);
-  setPaperClosed(closed);
+  saveAccount(account);
 
   if (!enteredCount && !exitedCount && !decisionLines.length) {
     decisionLines.push("<b>No auto paper action.</b><br>No result met the entry or exit rules.");
@@ -1585,12 +1709,21 @@ function addPaper() {
     shares = 1;
   }
 
-  var open = getPaperOpen();
+  var account = getAccount();
+  var cost = entry * shares;
 
-  open[sym] = {
+  if (cost > account.cash) {
+    showAlert("Not enough paper cash", "Trade cost is " + money(cost) + " but cash is " + money(account.cash), "warn");
+    return;
+  }
+
+  account.cash -= cost;
+
+  account.open[sym] = {
     symbol: sym,
     entry: entry,
     shares: shares,
+    cost: cost,
     stop: null,
     target: null,
     target2: null,
@@ -1605,20 +1738,20 @@ function addPaper() {
     lastDecision: "MANUAL"
   };
 
-  setPaperOpen(open);
+  saveAccount(account);
 
   el("paperSymbol").value = "";
   el("paperEntry").value = "";
   el("paperShares").value = "";
 
   renderPaper();
+  renderAccount();
   showAlert("Manual paper trade added", sym + " added at " + money(entry), "");
 }
 
 function closePaper(symbol) {
-  var open = getPaperOpen();
-  var closed = getPaperClosed();
-  var pos = open[symbol];
+  var account = getAccount();
+  var pos = account.open[symbol];
 
   if (!pos) {
     return;
@@ -1631,14 +1764,20 @@ function closePaper(symbol) {
   var exitPrice = r ? Number(r.price) : Number(pos.lastPrice || pos.entry);
   var entryPrice = Number(pos.entry);
   var shares = Number(pos.shares || 1);
-  var pnl = (exitPrice - entryPrice) * shares;
-  var pnlPct = ((exitPrice - entryPrice) / entryPrice) * 100;
+  var cost = Number(pos.cost || entryPrice * shares);
+  var proceeds = exitPrice * shares;
+  var pnl = proceeds - cost;
+  var pnlPct = (pnl / cost) * 100;
 
-  closed.unshift({
+  account.cash += proceeds;
+
+  account.closed.unshift({
     symbol: pos.symbol,
     entry: entryPrice,
     exit: exitPrice,
     shares: shares,
+    cost: cost,
+    proceeds: proceeds,
     pnl: pnl,
     pnlPct: pnlPct,
     entryTime: pos.entryTime,
@@ -1650,35 +1789,20 @@ function closePaper(symbol) {
     holdNote: pos.holdNote || ""
   });
 
-  delete open[symbol];
+  delete account.open[symbol];
 
-  setPaperOpen(open);
-  setPaperClosed(closed);
+  saveAccount(account);
   renderPaper();
+  renderAccount();
 
   showAlert("Manual paper close", symbol + " closed at " + money(exitPrice) + ". P/L " + money(pnl), pnl >= 0 ? "" : "bad");
   speak("Paper trade manually closed. " + symbol + " at " + money(exitPrice) + ".");
   log("MANUAL PAPER CLOSE: " + symbol + " at " + money(exitPrice));
 }
 
-function clearPaper() {
-  localStorage.removeItem("paperOpen");
-  localStorage.removeItem("paperClosed");
-  renderPaper();
-  setAutoDecision("Paper trades and logs cleared.");
-  log("Paper trades and log cleared.");
-}
-
-function clearClosedLog() {
-  localStorage.removeItem("paperClosed");
-  renderPaper();
-  setAutoDecision("Closed paper trade log cleared. Open paper positions were kept.");
-  log("Closed paper trade log cleared.");
-}
-
 function scanPaper() {
-  var open = getPaperOpen();
-  var keys = Object.keys(open);
+  var account = getAccount();
+  var keys = Object.keys(account.open || {});
 
   if (!keys.length) {
     showAlert("No paper trades", "Add or auto-enter a paper trade first.", "warn");
@@ -1689,9 +1813,20 @@ function scanPaper() {
   scan();
 }
 
+function clearClosedLog() {
+  var account = getAccount();
+  account.closed = [];
+  saveAccount(account);
+  renderPaper();
+  renderAccount();
+  setAutoDecision("Closed paper trade log cleared. Open paper positions were kept.");
+  log("Closed paper trade log cleared.");
+}
+
 function renderPaper() {
-  var open = getPaperOpen();
-  var closed = getPaperClosed();
+  var account = getAccount();
+  var open = account.open || {};
+  var closed = account.closed || [];
   var keys = Object.keys(open);
 
   setText("paperCount", keys.length);
@@ -1707,16 +1842,24 @@ function renderPaper() {
           return x.symbol === sym;
         });
 
-        var now = r ? Number(r.price) : Number(p.lastPrice || p.entry);
+        if (r) {
+          p.lastPrice = Number(r.price);
+          p.lastScore = r.score;
+          p.lastDecision = r.decision;
+          open[sym] = p;
+        }
+
+        var now = Number(p.lastPrice || p.entry);
         var pnl = (now - Number(p.entry)) * Number(p.shares || 1);
-        var pnlPct = ((now - Number(p.entry)) / Number(p.entry)) * 100;
+        var cost = Number(p.cost || Number(p.entry) * Number(p.shares || 1));
+        var pnlPct = cost ? (pnl / cost) * 100 : 0;
         var cls = pnl >= 0 ? "holding good" : "holding bad";
         var exitReason = r ? shouldAutoExit(p, r) : "";
 
         return "<div class='" + cls + "'>" +
           "<b>" + escapeHtml(sym) + " open</b><br>" +
           "Entry: " + money(p.entry) + " | Now: " + money(now) + " | Shares: " + escapeHtml(p.shares || 1) + "<br>" +
-          "P/L: " + money(pnl) + " (" + pnlPct.toFixed(2) + "%)<br>" +
+          "Cost: " + money(cost) + " | P/L: " + money(pnl) + " (" + pnlPct.toFixed(2) + "%)<br>" +
           "Stop: " + money(p.stop) + " | Target: " + money(p.target) + "<br>" +
           "Entry score: " + escapeHtml(p.entryScore || "-") + " | Last score: " + escapeHtml(r ? r.score : p.lastScore || "-") + "<br>" +
           "Entry time: " + escapeHtml(p.entryTime || "") + "<br>" +
@@ -1728,16 +1871,20 @@ function renderPaper() {
     }
   }
 
+  account.open = open;
+  saveAccount(account);
+
   var closedBox = el("closedBox");
   if (closedBox) {
     if (!closed.length) {
       closedBox.innerHTML = "<p>No closed trades yet.</p>";
     } else {
-      closedBox.innerHTML = closed.slice(0, 40).map(function (t) {
+      closedBox.innerHTML = closed.slice(0, 60).map(function (t) {
         var good = Number(t.pnl) >= 0;
         return "<div class='" + (good ? "holding good" : "holding bad") + "'>" +
           "<b>" + escapeHtml(t.symbol) + " closed</b><br>" +
           "Entry: " + money(t.entry) + " | Exit: " + money(t.exit) + " | Shares: " + escapeHtml(t.shares) + "<br>" +
+          "Cost: " + money(t.cost) + " | Proceeds: " + money(t.proceeds) + "<br>" +
           "P/L: " + money(t.pnl) + " (" + Number(t.pnlPct).toFixed(2) + "%)<br>" +
           "Entry time: " + escapeHtml(t.entryTime) + "<br>" +
           "Exit time: " + escapeHtml(t.exitTime) + "<br>" +
@@ -1747,13 +1894,23 @@ function renderPaper() {
       }).join("");
     }
   }
+
+  renderAccount();
 }
 
 function exportLog() {
   var data = {
     exportedAt: nowText(),
-    open: getPaperOpen(),
-    closed: getPaperClosed()
+    account: getAccount(),
+    settings: {
+      autoPaper: AUTO_PAPER,
+      scannerRunning: SCANNER_RUNNING,
+      muted: MUTED,
+      maxTradePct: el("maxTradePct") ? el("maxTradePct").value : "20",
+      maxOpenTrades: el("maxOpenTrades") ? el("maxOpenTrades").value : "5",
+      autoMinScore: el("autoMinScore") ? el("autoMinScore").value : "82",
+      autoMinRR: el("autoMinRR") ? el("autoMinRR").value : "1.8"
+    }
   };
 
   var text = JSON.stringify(data, null, 2);
@@ -1769,39 +1926,87 @@ function exportLog() {
   URL.revokeObjectURL(url);
 }
 
+function saveSettings() {
+  localStorage.setItem("autoPaperOn", AUTO_PAPER ? "true" : "false");
+  localStorage.setItem("scannerRunning", SCANNER_RUNNING ? "true" : "false");
+  localStorage.setItem("scannerMuted", MUTED ? "true" : "false");
+}
+
 function start() {
-  el("selfBtn").addEventListener("click", selfTest);
-  el("voiceBtn").addEventListener("click", voiceTest);
-  el("scanBtn").addEventListener("click", scan);
-  el("loopBtn").addEventListener("click", toggleLoop);
+  document.addEventListener("click", unlockVoiceOnce, { once: true });
+
+  el("scanBtn").addEventListener("click", function () {
+    SCANNER_RUNNING = true;
+    saveSettings();
+    updateRunButtons();
+    scan();
+  });
+
+  el("pauseBtn").addEventListener("click", toggleScanner);
+  el("muteBtn").addEventListener("click", toggleMute);
   el("autoBtn").addEventListener("click", toggleAutoPaper);
+  el("resetAccountBtn").addEventListener("click", resetAccount);
   el("addPaperBtn").addEventListener("click", addPaper);
   el("scanPaperBtn").addEventListener("click", scanPaper);
-  el("clearPaperBtn").addEventListener("click", clearPaper);
   el("clearClosedBtn").addEventListener("click", clearClosedLog);
   el("exportLogBtn").addEventListener("click", exportLog);
 
-  if (el("autoMinScore")) {
-    el("autoMinScore").addEventListener("input", updateAutoRules);
-  }
-
-  if (el("autoMinRR")) {
-    el("autoMinRR").addEventListener("input", updateAutoRules);
-  }
+  [
+    "autoMinScore",
+    "autoMinRR",
+    "maxTradePct",
+    "maxOpenTrades",
+    "accountSize",
+    "refresh"
+  ].forEach(function (id) {
+    if (el(id)) {
+      el(id).addEventListener("input", function () {
+        updateAutoRules();
+        scheduleLoop();
+      });
+    }
+  });
 
   updateAutoState();
   updateAutoRules();
+  updateMuteButton();
+  updateRunButtons();
 
-  status("SCRIPT OK. Full scanner loaded. Press Self Test.", "good");
+  status("Scanner loading. Auto-start enabled.", "work");
   log("SCRIPT OK. JavaScript is running.");
 
   renderPaper();
+  renderAccount();
   updateTimers();
 
   TIMER = setInterval(updateTimers, 1000);
 
   keepAlive();
   KEEP_TIMER = setInterval(keepAlive, 240000);
+
+  selfCheck();
+
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden) {
+      keepAlive();
+      if (SCANNER_RUNNING) {
+        scheduleLoop();
+      }
+    }
+  });
+
+  window.addEventListener("focus", function () {
+    keepAlive();
+    if (SCANNER_RUNNING) {
+      scheduleLoop();
+    }
+  });
+
+  if (SCANNER_RUNNING) {
+    setTimeout(scan, 900);
+  } else {
+    status("Scanner paused.", "bad");
+  }
 }
 
 if (document.readyState === "loading") {
