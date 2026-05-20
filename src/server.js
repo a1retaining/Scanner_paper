@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const VERSION = "25.0.0";
+const VERSION = "26.0.0";
 
 const DEFAULT_SYMBOLS = [
   "SPY", "QQQ", "AAPL", "MSFT", "NVDA", "AMZN", "META", "GOOGL",
@@ -18,13 +18,44 @@ const DEFAULT_SYMBOLS = [
 ];
 
 const DISCOVERY = [
-  "AAPL", "MSFT", "NVDA", "AMZN", "META", "GOOGL", "AVGO", "TSLA",
-  "LLY", "JPM", "V", "MA", "UNH", "COST", "HD", "WMT", "NFLX",
-  "AMD", "CRM", "ADBE", "NOW", "ORCL", "PANW", "CRWD", "MU",
-  "QCOM", "AMAT", "LRCX", "SMCI", "ARM", "VRT", "GE", "CAT",
-  "DE", "UBER", "SHOP", "MELI", "AXP", "BKNG", "GS", "MS",
-  "BAC", "XOM", "CVX", "LIN", "ISRG", "SPY", "QQQ", "DIA",
-  "IWM", "XLK", "XLF", "XLE", "XLV", "SMH", "IBB"
+  "SPY", "QQQ", "DIA", "IWM", "VTI", "VOO", "XLK", "XLF", "XLE", "XLV",
+  "XLY", "XLC", "XLI", "XLP", "XLU", "XLB", "SMH", "SOXX", "IBB", "ARKK",
+
+  "AAPL", "MSFT", "NVDA", "AMZN", "META", "GOOGL", "GOOG", "AVGO", "TSLA", "BRK-B",
+  "LLY", "JPM", "V", "MA", "UNH", "XOM", "COST", "WMT", "NFLX", "PG",
+  "JNJ", "HD", "ABBV", "BAC", "KO", "CRM", "ORCL", "MRK", "CVX", "AMD",
+  "PEP", "ADBE", "TMO", "ACN", "LIN", "MCD", "CSCO", "ABT", "QCOM", "WFC",
+  "INTU", "TXN", "AMGN", "IBM", "NOW", "GE", "DHR", "PM", "ISRG", "CAT",
+  "VZ", "DIS", "NEE", "PFE", "RTX", "GS", "SPGI", "AXP", "UBER", "BKNG",
+
+  "PANW", "CRWD", "FTNT", "ZS", "NET", "DDOG", "SNOW", "MDB", "TEAM", "ADSK",
+  "SHOP", "MELI", "SE", "ETSY", "ROKU", "TTD", "APP", "PLTR", "COIN", "HOOD",
+  "SQ", "PYPL", "AFRM", "SOFI", "UPST", "RBLX", "U", "AI", "PATH", "HIMS",
+
+  "AMAT", "LRCX", "KLAC", "ASML", "TSM", "MU", "MRVL", "ARM", "SMCI", "VRT",
+  "DELL", "HPE", "INTC", "ON", "NXPI", "ADI", "MCHP", "MPWR", "TER", "ENTG",
+
+  "JPM", "BAC", "WFC", "C", "GS", "MS", "BLK", "SCHW", "AXP", "COF",
+  "DFS", "V", "MA", "PYPL", "FI", "FIS", "ICE", "CME", "MCO", "SPGI",
+
+  "LLY", "UNH", "JNJ", "MRK", "ABBV", "TMO", "ABT", "DHR", "ISRG", "SYK",
+  "BSX", "MDT", "VRTX", "REGN", "GILD", "AMGN", "BIIB", "BMY", "PFE", "MRNA",
+  "DXCM", "IDXX", "EW", "ZBH", "HCA", "CI", "HUM", "ELV", "CVS", "CNC",
+
+  "XOM", "CVX", "COP", "SLB", "EOG", "MPC", "PSX", "VLO", "OXY", "HAL",
+  "KMI", "WMB", "LNG", "FANG", "DVN", "BKR", "OKE", "TRGP", "EQT", "APA",
+
+  "CAT", "DE", "GE", "HON", "RTX", "LMT", "NOC", "BA", "ETN", "EMR",
+  "PH", "CMI", "ITW", "UPS", "FDX", "UNP", "CSX", "NSC", "URI", "PCAR",
+
+  "COST", "WMT", "TGT", "HD", "LOW", "TJX", "NKE", "SBUX", "MCD", "CMG",
+  "YUM", "BKNG", "MAR", "RCL", "CCL", "ABNB", "LULU", "ULTA", "DG", "DLTR",
+
+  "META", "GOOGL", "GOOG", "NFLX", "DIS", "TTD", "ROKU", "PINS", "SNAP", "RDDT",
+  "TMUS", "VZ", "T", "CHTR", "CMCSA", "EA", "TTWO", "WBD", "LYV", "SPOT",
+
+  "LIN", "SHW", "APD", "ECL", "FCX", "NEM", "NUE", "STLD", "DD", "DOW",
+  "MLM", "VMC", "ALB", "CF", "MOS", "SCCO", "CLF", "AA", "TECK", "RIO"
 ];
 
 const cache = new Map();
@@ -38,7 +69,6 @@ app.use(helmet({
 app.use(cors({ origin: "*" }));
 app.use(compression());
 app.use(express.json());
-
 app.use(express.static(path.join(__dirname, "../public")));
 
 const round = (n, d = 2) => Number.isFinite(Number(n)) ? Number(Number(n).toFixed(d)) : null;
@@ -47,7 +77,6 @@ const sma = (a, p) => a.length >= p ? a.slice(-p).reduce((s, v) => s + v, 0) / p
 
 function ema(a, p) {
   if (a.length < p) return null;
-
   const k = 2 / (p + 1);
   let e = sma(a.slice(0, p), p);
 
@@ -101,7 +130,7 @@ function parseSymbols(s, fallback = DEFAULT_SYMBOLS) {
     .split(",")
     .map(x => x.trim().toUpperCase())
     .filter(Boolean)
-    .slice(0, 60);
+    .slice(0, 80);
 }
 
 async function yahooBars(symbol, range = "1y", interval = "1d") {
@@ -189,6 +218,27 @@ async function getBars(symbol, range = "1y", interval = "1d") {
   }
 }
 
+async function mapWithConcurrency(items, limit, worker) {
+  const out = [];
+  let index = 0;
+
+  async function run() {
+    while (index < items.length) {
+      const current = index++;
+      try {
+        out[current] = await worker(items[current], current);
+      } catch (e) {
+        out[current] = { error: e.message, symbol: items[current] };
+      }
+    }
+  }
+
+  const workers = Array.from({ length: Math.min(limit, items.length) }, run);
+  await Promise.all(workers);
+
+  return out;
+}
+
 function scanOne(symbol, bars, spyBars, risk = 100) {
   const closes = bars.map(b => b.close);
   const vols = bars.map(b => b.volume || 0);
@@ -202,65 +252,68 @@ function scanOne(symbol, bars, spyBars, risk = 100) {
   const a14 = atr(bars);
   const avgv = sma(vols, 20);
   const vr = avgv ? last.volume / avgv : null;
-
   const hi20 = Math.max(...bars.slice(-20).map(b => b.high));
 
   const spy = spyBars?.map(b => b.close) || [];
   const spymove = spy.length > 21 ? (spy.at(-1) - spy.at(-21)) / spy.at(-21) * 100 : 0;
   const stockmove = closes.length > 21 ? (price - closes.at(-21)) / closes.at(-21) * 100 : 0;
 
-  let score = 0;
+  let strength = 0;
+  let entry = 0;
   const reasons = [];
   const warnings = [];
 
   if (price > s200) {
-    score += 18;
+    strength += 18;
     reasons.push("Price is above the 200-day trend line.");
   } else {
     warnings.push("Price is below or near the 200-day trend line.");
   }
 
   if (e20 > e50) {
-    score += 16;
+    strength += 16;
     reasons.push("EMA20 is above EMA50.");
   }
 
   if (e50 > s200) {
-    score += 12;
+    strength += 12;
     reasons.push("EMA50 is above SMA200.");
   }
 
   if (price > e20) {
-    score += 7;
+    strength += 7;
     reasons.push("Price is holding above EMA20.");
   }
 
   if (r14 >= 50 && r14 <= 70) {
-    score += 10;
+    strength += 10;
+    entry += 8;
     reasons.push("RSI is in a healthy bullish zone.");
   } else if (r14 > 70) {
-    score += 3;
+    strength += 4;
+    entry -= 12;
     warnings.push("RSI is stretched and may be too hot to chase.");
   }
 
   if (vr >= 1.5) {
-    score += 13;
+    strength += 13;
+    entry += 5;
     reasons.push(`Relative volume is active at ${round(vr, 2)}x.`);
   } else if (vr < 0.8) {
     warnings.push("Relative volume is low.");
   }
 
   if (stockmove - spymove > 0) {
-    score += 10;
+    strength += 10;
     reasons.push("Relative strength is better than SPY.");
   }
 
   if (price >= hi20 * 0.985) {
-    score += 8;
+    strength += 8;
     reasons.push("Price is near or above the prior 20-day breakout area.");
   }
 
-  score = Math.max(0, Math.min(100, Math.round(score)));
+  strength = Math.max(0, Math.min(100, Math.round(strength)));
 
   const stop = round(price - (a14 ? a14 * 1.8 : price * 0.04));
   const target1 = round(price + Math.abs(price - stop) * 2);
@@ -269,25 +322,58 @@ function scanOne(symbol, bars, spyBars, risk = 100) {
   const buyLow = round(Math.min(price * 0.985, e20 ? e20 * 1.01 : price * 0.985));
   const buyHigh = round(price * 0.997);
 
-  const inside = price >= buyLow && price <= buyHigh;
-  const stretched = warnings.join(" ").toLowerCase().includes("stretched");
+  const rr = round((target1 - price) / Math.max(0.01, price - stop), 2);
+
+  const distance = price > buyHigh
+    ? (price - buyHigh) / buyHigh * 100
+    : price < buyLow
+      ? -((buyLow - price) / buyLow * 100)
+      : 0;
+
+  if (distance === 0) {
+    entry += 30;
+  } else if (distance > 0 && distance <= 0.5) {
+    entry += 18;
+    warnings.push("Price is slightly above the ideal buy zone.");
+  } else if (distance > 0.5 && distance <= 2) {
+    entry += 4;
+    warnings.push("Price is above the buy zone. Better entry may need a pullback.");
+  } else if (distance > 2) {
+    entry -= 25;
+    warnings.push("Price is extended above the buy zone. Do not chase.");
+  } else if (distance < 0) {
+    entry += 8;
+    warnings.push("Price is below the buy zone. Watch for confirmation before entry.");
+  }
+
+  if (rr >= 2) {
+    entry += 14;
+  } else if (rr >= 1.5) {
+    entry += 7;
+  } else {
+    entry -= 10;
+    warnings.push("Risk/reward is not strong enough.");
+  }
+
+  const entryScore = Math.max(0, Math.min(100, Math.round(strength * 0.55 + entry)));
+  const rankScore = Math.max(0, Math.min(100, Math.round(strength * 0.6 + entryScore * 0.4)));
 
   let decision = "WATCH_LONG";
   let setupType = "Trend Watch";
   let summary = `${symbol} is worth watching, but it is not a clean entry yet.`;
   let actionPlan = `Watch only. A cleaner entry would be ${buyLow} to ${buyHigh}. Stop at ${stop}.`;
 
-  if (score >= 82 && !stretched && inside) {
+  if (strength >= 82 && entryScore >= 78 && distance <= 0.5 && rr >= 1.8) {
     decision = "ENTER_NOW";
     setupType = "Swing Entry";
-    summary = `${symbol} has a strong swing setup and is inside the buy zone.`;
+    summary = `${symbol} has a strong swing setup and is close enough to the buy zone.`;
     actionPlan = `Entry can be considered near ${round(price)}. Stop at ${stop}. Targets are ${target1} and ${target2}.`;
-  } else if (score >= 70) {
+  } else if (strength >= 70) {
     decision = "WAIT_FOR_PULLBACK";
     setupType = "Pullback";
     summary = `${symbol} is strong but should not be chased. Wait for price to pull back into the buy zone.`;
-    actionPlan = `Do not chase. Best buy zone is ${buyLow} to ${buyHigh}. If price enters that zone and the score remains strong, this can change to ENTER NOW. Stop at ${stop}. Targets are ${target1} and ${target2}.`;
-  } else if (score >= 58) {
+    actionPlan = `Do not chase. Best buy zone is ${buyLow} to ${buyHigh}. If price enters that zone and the score remains strong, this can change to ENTER_NOW. Stop at ${stop}. Targets are ${target1} and ${target2}.`;
+  } else if (strength >= 58) {
     decision = "WAIT_FOR_BREAKOUT";
     setupType = "Breakout Watch";
     summary = `${symbol} is not ready yet. Watch for a clean breakout confirmation.`;
@@ -301,46 +387,20 @@ function scanOne(symbol, bars, spyBars, risk = 100) {
 
   reasons.push("Swing-first mode is active because the account should avoid PDT-style day trading.");
 
-  const rr = round((target1 - price) / (price - stop), 2);
-  const distance = price > buyHigh
-    ? (price - buyHigh) / buyHigh * 100
-    : price < buyLow
-      ? -((buyLow - price) / buyLow * 100)
-      : 0;
-
-  let actionability = score;
-
-  if (distance === 0) {
-    actionability += 12;
-  } else if (distance > 4) {
-    actionability -= 25;
-  } else if (distance > 1.5) {
-    actionability -= 10;
-  }
-
-  if (stretched) {
-    actionability -= 14;
-  }
-
-  if (rr >= 2) {
-    actionability += 6;
-  }
-
-  actionability = Math.max(0, Math.min(100, Math.round(actionability)));
-
   return {
     symbol,
     mode: "swing",
-    score,
-    strengthScore: score,
-    actionabilityScore: actionability,
-    rankScore: Math.round(score * 0.55 + actionability * 0.45),
+    score: entryScore,
+    strengthScore: strength,
+    entryScore,
+    actionabilityScore: entryScore,
+    rankScore,
     setupType,
     decision,
     tradeDecision: decision,
     action: decision,
     signal: decision,
-    confidence: score >= 82 ? "Strong" : score >= 70 ? "Good" : score >= 58 ? "Fair" : "Weak",
+    confidence: strength >= 82 ? "Strong" : strength >= 70 ? "Good" : strength >= 58 ? "Fair" : "Weak",
     price: round(price),
     currentPrice: round(price),
     entry: round(price),
@@ -384,9 +444,9 @@ function scanOne(symbol, bars, spyBars, risk = 100) {
       timeframe: "1Y daily candles",
       chartRead: "The chart uses 1 year of daily candles and shows current price, buy zone, stop, target, and breakout level.",
       entryRule: decision === "WAIT_FOR_PULLBACK"
-        ? `Do not enter immediately. If price pulls back into ${buyLow} to ${buyHigh} and the score stays above 70, the paper engine can change this to ENTER NOW.`
+        ? `Do not enter immediately. If price pulls back into ${buyLow} to ${buyHigh} and the score stays strong, the paper engine can change this to ENTER_NOW.`
         : decision === "ENTER_NOW"
-          ? "Entry is allowed because price is inside the buy zone and the trend rules are met."
+          ? "Entry is allowed because price is close enough to the buy zone and the trend rules are met."
           : "No entry yet. Wait for the rule shown in the action plan.",
       exitRule: `Exit if price hits the stop at ${stop}, reaches target, or scanner score falls below the danger level.`
     }
@@ -399,16 +459,21 @@ async function makeScan(symbols, risk, source = "watchlist") {
   const raw = [];
   const errors = [];
 
-  for (const sym of symbols) {
-    try {
-      raw.push(scanOne(sym, sym === "SPY" ? spy : await getBars(sym), spy, risk));
-    } catch (e) {
+  const results = await mapWithConcurrency(symbols, 8, async function(sym) {
+    const bars = sym === "SPY" ? spy : await getBars(sym);
+    return scanOne(sym, bars, spy, risk);
+  });
+
+  results.forEach(function(item) {
+    if (item && item.error) {
       errors.push({
-        symbol: sym,
-        error: e.message
+        symbol: item.symbol,
+        error: item.error
       });
+    } else if (item) {
+      raw.push(item);
     }
-  }
+  });
 
   raw.sort((a, b) => b.rankScore - a.rankScore || b.score - a.score);
 
@@ -452,6 +517,7 @@ app.get("/api/health", function(req, res) {
     version: VERSION,
     app: "/",
     defaultSymbols: DEFAULT_SYMBOLS,
+    discoveryCount: DISCOVERY.length,
     cacheSeconds: 180,
     time: new Date().toISOString()
   });
@@ -509,16 +575,22 @@ app.get("/scan", async function(req, res) {
 app.get("/api/discover", async function(req, res) {
   try {
     const exclude = new Set(parseSymbols(req.query.exclude || "", []));
-    const limit = Math.max(3, Math.min(20, Number(req.query.limit || 10)));
-    const symbols = DISCOVERY.filter(s => !exclude.has(s)).slice(0, 60);
+    const limit = Math.max(3, Math.min(30, Number(req.query.limit || 15)));
+    const scanLimit = Math.max(30, Math.min(140, Number(req.query.scanLimit || 100)));
 
-    const out = await makeScan(symbols, Number(req.query.risk || 100), "discovery");
+    const symbols = DISCOVERY
+      .filter(s => !exclude.has(s))
+      .slice(0, scanLimit);
+
+    const out = await makeScan(symbols, Number(req.query.risk || 100), "expanded-discovery");
 
     out.signals = out.signals
-      .filter(s => s.score >= 70 && s.actionabilityScore >= 58 && !/AVOID/i.test(s.decision))
+      .filter(s => s.score >= 58 && s.actionabilityScore >= 50 && !/AVOID/i.test(s.decision))
       .slice(0, limit);
 
     out.shown = out.signals.length;
+    out.discoveryUniverse = DISCOVERY.length;
+    out.discoveryScanned = symbols.length;
 
     res.json(out);
   } catch (e) {
@@ -532,16 +604,22 @@ app.get("/api/discover", async function(req, res) {
 app.get("/discover", async function(req, res) {
   try {
     const exclude = new Set(parseSymbols(req.query.exclude || "", []));
-    const limit = Math.max(3, Math.min(20, Number(req.query.limit || 10)));
-    const symbols = DISCOVERY.filter(s => !exclude.has(s)).slice(0, 60);
+    const limit = Math.max(3, Math.min(30, Number(req.query.limit || 15)));
+    const scanLimit = Math.max(30, Math.min(140, Number(req.query.scanLimit || 100)));
 
-    const out = await makeScan(symbols, Number(req.query.risk || 100), "discovery");
+    const symbols = DISCOVERY
+      .filter(s => !exclude.has(s))
+      .slice(0, scanLimit);
+
+    const out = await makeScan(symbols, Number(req.query.risk || 100), "expanded-discovery");
 
     out.signals = out.signals
-      .filter(s => s.score >= 70 && s.actionabilityScore >= 58 && !/AVOID/i.test(s.decision))
+      .filter(s => s.score >= 58 && s.actionabilityScore >= 50 && !/AVOID/i.test(s.decision))
       .slice(0, limit);
 
     out.shown = out.signals.length;
+    out.discoveryUniverse = DISCOVERY.length;
+    out.discoveryScanned = symbols.length;
 
     res.json(out);
   } catch (e) {
