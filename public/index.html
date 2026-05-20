@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>US Trade Scanner</title>
+
 <style>
 :root{
   --bg:#020403;
@@ -15,7 +16,6 @@
   --green2:#7dffa8;
   --yellow:#ffd166;
   --red:#ff5577;
-  --blue:#57a6ff;
   --gray:#cbd5e1;
 }
 *{box-sizing:border-box}
@@ -28,9 +28,7 @@ html,body{
   color:var(--text);
   font-family:Arial,Helvetica,sans-serif;
 }
-body{
-  overflow:auto;
-}
+body{overflow:auto}
 #app{
   width:100%;
   min-height:100vh;
@@ -50,7 +48,7 @@ body{
   top:0;
   z-index:20;
   display:grid;
-  grid-template-columns:minmax(220px,1.2fr) repeat(4,minmax(105px,.5fr)) auto auto;
+  grid-template-columns:minmax(220px,1.3fr) repeat(6,minmax(105px,.5fr)) auto auto;
   gap:8px;
   align-items:center;
   background:rgba(0,15,8,.98);
@@ -60,10 +58,7 @@ body{
   margin-bottom:10px;
   backdrop-filter:blur(8px);
 }
-h1,h2,h3{
-  margin:0 0 8px;
-  color:var(--green2);
-}
+h1,h2,h3{margin:0 0 8px;color:var(--green2)}
 h1{font-size:23px}
 h2{font-size:14px;text-transform:uppercase}
 h3{font-size:12px;text-transform:uppercase}
@@ -89,10 +84,7 @@ textarea,input,select{
   padding:8px;
   font-size:12px;
 }
-textarea{
-  min-height:86px;
-  resize:vertical;
-}
+textarea{min-height:86px;resize:vertical}
 button{
   padding:9px 12px;
   border-radius:9px;
@@ -146,6 +138,10 @@ button.icon{
   overflow:hidden;
   text-overflow:ellipsis;
 }
+.pdt{
+  border-color:rgba(255,209,102,.55);
+}
+.pdt strong{color:var(--yellow)}
 .kpis{
   display:grid;
   grid-template-columns:repeat(8,minmax(110px,1fr));
@@ -210,7 +206,7 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
 }
 .paper-wide{
   display:grid;
-  grid-template-columns:repeat(6,minmax(110px,1fr));
+  grid-template-columns:repeat(8,minmax(110px,1fr));
   gap:8px;
   margin-bottom:10px;
 }
@@ -286,7 +282,7 @@ details summary{
   grid-template-columns:repeat(3,1fr);
   gap:10px;
 }
-@media(max-width:1100px){
+@media(max-width:1200px){
   .topbar,.kpis,.paper-wide,.paper-row,.layout,.bottom-grid,.grid4{
     grid-template-columns:1fr;
   }
@@ -305,10 +301,12 @@ details summary{
       <p><span id="statusDot" class="dot"></span><span id="status">Loading scanner...</span></p>
     </div>
 
-    <div class="level"><span>Equity</span><strong id="topEquity">$5,000.00</strong></div>
+    <div class="level"><span>Local Time</span><strong id="localTime">--:--</strong></div>
+    <div class="level"><span>US Market</span><strong id="marketState">Checking</strong></div>
+    <div class="level"><span>Market Countdown</span><strong id="marketCountdown">Checking</strong></div>
     <div class="level"><span>Next Scan</span><strong id="nextScan">Checking</strong></div>
-    <div class="level"><span>Market</span><strong id="marketState">Checking</strong></div>
-    <div class="level"><span>Discovery</span><strong id="discoveryText">Expanded</strong></div>
+    <div class="level"><span>Equity</span><strong id="topEquity">$5,000.00</strong></div>
+    <div class="level pdt"><span>Mode</span><strong>PDT Safe Swing</strong></div>
 
     <button id="muteBtn" class="icon" type="button" title="Mute or unmute">🔊</button>
     <button id="pauseBtn" class="yellow" type="button">Pause</button>
@@ -319,15 +317,15 @@ details summary{
     <div class="level"><span>Updated</span><strong id="updated">-</strong></div>
     <div class="level"><span>Signals</span><strong id="signalCount">0</strong></div>
     <div class="level"><span>Top</span><strong id="topSignal">-</strong></div>
+    <div class="level"><span>Discovery</span><strong id="discoveryText">Expanded</strong></div>
     <div class="level"><span>Cash</span><strong id="cashKpi">$5,000.00</strong></div>
-    <div class="level"><span>Open Value</span><strong id="openValueKpi">$0.00</strong></div>
-    <div class="level"><span>Realised P/L</span><strong id="realisedKpi">$0.00</strong></div>
+    <div class="level"><span>Daily P/L</span><strong id="dailyPnlKpi">$0.00</strong></div>
     <div class="level"><span>Unrealised P/L</span><strong id="unrealisedKpi">$0.00</strong></div>
   </section>
 
   <div class="card">
     <h2>Ranked Signals</h2>
-    <p>Auto-scans your watchlist and expanded discovery universe. Best choices stay at the top.</p>
+    <p>Auto-scans your watchlist and expanded discovery universe. Built for swing trades because the account is under $25k.</p>
     <div class="table-wrap">
       <table>
         <thead>
@@ -375,11 +373,13 @@ details summary{
     <h2>$5,000 Paper Account</h2>
     <div class="paper-wide">
       <div class="level"><span>Open Paper</span><strong id="paperCount">0</strong></div>
+      <div class="level"><span>Open Value</span><strong id="openValueKpi">$0.00</strong></div>
+      <div class="level"><span>Realised P/L</span><strong id="realisedKpi">$0.00</strong></div>
       <div class="level"><span>Win Rate</span><strong id="winRateKpi">0%</strong></div>
       <div class="level"><span>Closed Trades</span><strong id="closedCountKpi">0</strong></div>
+      <div class="level"><span>New Entries Today</span><strong id="entriesTodayKpi">0</strong></div>
       <div class="level"><span>Auto Paper</span><strong id="topAuto">On</strong></div>
       <div class="level"><span>Keepalive</span><strong id="keepalive">Starting</strong></div>
-      <div class="level"><span>Open/Close</span><strong id="marketCountdown">Checking</strong></div>
     </div>
 
     <div class="paper-row">
@@ -454,6 +454,9 @@ details summary{
       <label>Max open trades</label>
       <input id="maxOpenTrades" type="number" value="5" min="1" max="20">
 
+      <label>Max new entries per day</label>
+      <input id="maxDailyEntries" type="number" value="3" min="1" max="20">
+
       <label>Minimum score to auto-enter</label>
       <input id="autoMinScore" type="number" value="82" min="50" max="100">
 
@@ -499,6 +502,36 @@ function money(value){var n=Number(value);return Number.isFinite(n)?"$"+n.toFixe
 function num(value){var n=Number(value);return Number.isFinite(n)?n:null;}
 function pad(value){value=Number(value);return value<10?"0"+value:String(value);}
 function nowText(){return new Date().toLocaleString();}
+
+function todayKey(){
+  var d = new Date();
+  return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+}
+
+function parseDateSafe(value){
+  var d = new Date(value);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function sameToday(value){
+  var d = parseDateSafe(value);
+  if(!d)return false;
+  var n = new Date();
+  return d.getFullYear()===n.getFullYear() && d.getMonth()===n.getMonth() && d.getDate()===n.getDate();
+}
+
+function ageText(value){
+  var d = parseDateSafe(value);
+  if(!d)return "-";
+  var ms = Date.now() - d.getTime();
+  if(ms < 0) ms = 0;
+  var mins = Math.floor(ms / 60000);
+  var hours = Math.floor(mins / 60);
+  var days = Math.floor(hours / 24);
+  if(days > 0)return days+"d "+(hours%24)+"h";
+  if(hours > 0)return hours+"h "+(mins%60)+"m";
+  return mins+"m";
+}
 
 function log(message){
   var box=el("log");
@@ -635,18 +668,47 @@ function getRealised(account){
   return(account.closed||[]).reduce(function(sum,t){return sum+Number(t.pnl||0);},0);
 }
 
+function getDailyPnl(account){
+  return(account.closed||[]).filter(function(t){
+    return sameToday(t.exitTime);
+  }).reduce(function(sum,t){
+    return sum+Number(t.pnl||0);
+  },0);
+}
+
+function getEntriesToday(account){
+  var closedEntries = (account.closed||[]).filter(function(t){
+    return sameToday(t.entryTime);
+  }).length;
+
+  var openEntries = Object.keys(account.open||{}).filter(function(sym){
+    return sameToday(account.open[sym].entryTime);
+  }).length;
+
+  return closedEntries + openEntries;
+}
+
+function closedSameTickerToday(account,symbol){
+  return(account.closed||[]).some(function(t){
+    return String(t.symbol).toUpperCase()===String(symbol).toUpperCase() && sameToday(t.exitTime);
+  });
+}
+
 function renderAccount(){
   var account=getAccount();
   var closed=account.closed||[];
   var wins=closed.filter(function(t){return Number(t.pnl||0)>0;}).length;
   var winRate=closed.length?(wins/closed.length)*100:0;
+
   setText("topEquity",money(getEquity(account)));
   setText("cashKpi",money(account.cash));
   setText("openValueKpi",money(getOpenValue(account)));
   setText("realisedKpi",money(getRealised(account)));
+  setText("dailyPnlKpi",money(getDailyPnl(account)));
   setText("unrealisedKpi",money(getUnrealised(account)));
   setText("winRateKpi",winRate.toFixed(1)+"%");
   setText("closedCountKpi",closed.length);
+  setText("entriesTodayKpi",getEntriesToday(account));
   setText("paperCount",Object.keys(account.open||{}).length);
 }
 
@@ -821,9 +883,10 @@ function selectTrade(index,speakIt){
 
   el("education").innerHTML=
     "<b>Why it ranked:</b><br>"+reasons+
+    "<br><br><b>PDT-safe mode:</b> This scanner is built around swing trades because the account is under $25k."+
     "<br><br><b>Strength score:</b> How good the stock looks overall."+
     "<br><b>Entry score:</b> Whether it is safe to enter now."+
-    "<br><br><b>Auto paper:</b> Only enters ENTER_NOW trades with enough cash and acceptable risk/reward.";
+    "<br><br><b>Auto paper:</b> Only enters ENTER_NOW trades with enough cash, acceptable risk/reward, daily limits, and no same-ticker re-entry on the same day.";
 
   drawCandlestickChart(r);
 
@@ -995,6 +1058,9 @@ function marketClock(){
 }
 
 function updateTimers(){
+  var now = new Date();
+  setText("localTime",now.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit", second:"2-digit"}));
+
   var mc=marketClock();
   setText("marketState",mc.state);
   setText("marketCountdown",mc.countdown);
@@ -1085,16 +1151,20 @@ function updateAutoRules(){
   var minRR=el("autoMinRR")?el("autoMinRR").value:"1.8";
   var maxPct=el("maxTradePct")?el("maxTradePct").value:"20";
   var maxOpen=el("maxOpenTrades")?el("maxOpenTrades").value:"5";
+  var maxDaily=el("maxDailyEntries")?el("maxDailyEntries").value:"3";
   var box=el("autoRulesBox");
   if(!box)return;
 
   box.innerHTML=
+    "<b>PDT-safe swing mode</b><br>"+
+    "Built for accounts under $25k. No same-day re-entry for the same ticker.<br><br>"+
     "<b>Entry</b><br>"+
     "Decision must be ENTER_NOW.<br>"+
     "Entry score at least "+escapeHtml(minScore)+".<br>"+
     "Risk/reward at least "+escapeHtml(minRR)+".<br>"+
     "Max one trade "+escapeHtml(maxPct)+"% of equity.<br>"+
-    "Max open trades "+escapeHtml(maxOpen)+".<br><br>"+
+    "Max open trades "+escapeHtml(maxOpen)+".<br>"+
+    "Max new entries per day "+escapeHtml(maxDaily)+".<br><br>"+
     "<b>Exit</b><br>"+
     "Stop hit, target hit, SELL/EXIT/AVOID/TRIM, or entry score below 55.";
 }
@@ -1108,6 +1178,7 @@ function autoRejectReason(r,account){
   var minScore=Number(el("autoMinScore")?el("autoMinScore").value:82);
   var minRR=Number(el("autoMinRR")?el("autoMinRR").value:1.8);
   var maxOpen=Number(el("maxOpenTrades")?el("maxOpenTrades").value:5);
+  var maxDaily=Number(el("maxDailyEntries")?el("maxDailyEntries").value:3);
   var open=account.open||{};
   var lines=[];
 
@@ -1115,6 +1186,8 @@ function autoRejectReason(r,account){
 
   if(open[r.symbol])lines.push("Reason: already open.");
   else if(Object.keys(open).length>=maxOpen)lines.push("Reason: max open trades reached.");
+  else if(getEntriesToday(account)>=maxDaily)lines.push("Reason: max new entries for today reached.");
+  else if(closedSameTickerToday(account,r.symbol))lines.push("Reason: same ticker was closed today. No re-entry today in PDT-safe mode.");
   else if(!/ENTER_NOW/i.test(String(r.decision)))lines.push("Reason: scanner says "+escapeHtml(String(r.decision).replace(/_/g," "))+", not ENTER_NOW.");
   else if(Number(r.score)<minScore)lines.push("Reason: entry score "+escapeHtml(r.score)+" is below minimum "+escapeHtml(minScore)+".");
   else if(Number(r.rr)<minRR)lines.push("Reason: risk/reward "+escapeHtml(r.rr)+" is below minimum "+escapeHtml(minRR)+".");
@@ -1134,10 +1207,13 @@ function canAutoEnter(r,account){
   var minScore=Number(el("autoMinScore")?el("autoMinScore").value:82);
   var minRR=Number(el("autoMinRR")?el("autoMinRR").value:1.8);
   var maxOpen=Number(el("maxOpenTrades")?el("maxOpenTrades").value:5);
+  var maxDaily=Number(el("maxDailyEntries")?el("maxDailyEntries").value:3);
   var open=account.open||{};
 
   if(open[r.symbol])return false;
   if(Object.keys(open).length>=maxOpen)return false;
+  if(getEntriesToday(account)>=maxDaily)return false;
+  if(closedSameTickerToday(account,r.symbol))return false;
   if(!/ENTER_NOW/i.test(String(r.decision)))return false;
   if(Number(r.score)<minScore)return false;
   if(Number(r.rr)<minRR)return false;
@@ -1221,7 +1297,7 @@ function autoPaperCheck(){
         speak("Paper trade exited. "+r.symbol+". Reason "+exitReason+".");
       }else{
         account.open[r.symbol]=pos;
-        if(decisionLines.length<8)decisionLines.push("<b>"+escapeHtml(r.symbol)+" already open</b><br>Still holding. No exit rule triggered.");
+        if(decisionLines.length<8)decisionLines.push("<b>"+escapeHtml(r.symbol)+" already open</b><br>Still holding. Age: "+ageText(pos.entryTime)+". No exit rule triggered.");
       }
       return;
     }
@@ -1389,7 +1465,7 @@ function renderPaper(){
           "Cost: "+money(cost)+" | P/L: "+money(pnl)+" ("+pnlPct.toFixed(2)+"%)<br>"+
           "Stop: "+money(p.stop)+" | Target: "+money(p.target)+"<br>"+
           "Entry score: "+escapeHtml(p.entryScore||"-")+" | Last score: "+escapeHtml(r?r.score:p.lastScore||"-")+"<br>"+
-          "Entry time: "+escapeHtml(p.entryTime||"")+"<br>"+
+          "Age: "+escapeHtml(ageText(p.entryTime))+" | Entry time: "+escapeHtml(p.entryTime||"")+"<br>"+
           "Reason: "+escapeHtml(p.entryReason||"")+
           (exitReason?"<br><b style='color:#ff5577'>Exit signal: "+escapeHtml(exitReason)+"</b>":"")+
           "<br><button class='danger' type='button' onclick='closePaper("+JSON.stringify(sym)+")'>Close Paper Trade</button>"+
@@ -1451,7 +1527,7 @@ function start(){
   el("clearClosedBtn").addEventListener("click",clearClosedLog);
   el("exportLogBtn").addEventListener("click",exportLog);
 
-  ["autoMinScore","autoMinRR","maxTradePct","maxOpenTrades","accountSize","refresh","scanLimit"].forEach(function(id){
+  ["autoMinScore","autoMinRR","maxTradePct","maxOpenTrades","maxDailyEntries","accountSize","refresh","scanLimit"].forEach(function(id){
     if(el(id)){
       el(id).addEventListener("input",function(){updateAutoRules();scheduleLoop();});
       el(id).addEventListener("change",function(){updateAutoRules();if(SCANNER_RUNNING)scan();});
