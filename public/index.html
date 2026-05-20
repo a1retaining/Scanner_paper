@@ -283,7 +283,7 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
 .warn{border-color:rgba(255,85,119,.45)}
 #chart{
   width:100%;
-  height:500px;
+  height:560px;
   display:block;
   background:#000;
   border:1px solid var(--green);
@@ -336,6 +336,12 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
   font-size:12px;
   color:var(--muted);
 }
+.paper-wide{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(110px,1fr));
+  gap:8px;
+  margin-bottom:10px;
+}
 @media(max-width:950px){
   html,body{overflow:auto}
   #app{
@@ -343,10 +349,10 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
     grid-template-columns:1fr;
     min-height:100vh;
   }
-  .kpis,.grid4,.grid3,.paper-row{
+  .kpis,.grid4,.grid3,.paper-row,.paper-wide{
     grid-template-columns:1fr;
   }
-  #chart{height:360px}
+  #chart{height:380px}
   table{min-width:980px}
 }
 </style>
@@ -356,8 +362,18 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
 <div id="app">
   <aside class="side">
     <div class="card">
+      <h2>Scanner Live Status</h2>
+      <p><span id="sideStatusDot" class="dot"></span><b id="sideStatus">Starting...</b></p>
+      <p>Mode: <b>PDT-safe swing scanner</b></p>
+      <p>Discovery: <b id="discoveryText">expanded universe</b></p>
+      <p>Next scan: <b id="sideNextScan">Checking...</b></p>
+      <p>Last scan: <b id="sideLastScan">Not yet</b></p>
+      <p>Keepalive: <b id="keepalive">Starting...</b></p>
+      <p style="color:#ffd166">No scan button needed. It scans automatically while this page is open.</p>
+    </div>
+
+    <div class="card">
       <h2>Scanner Settings</h2>
-      <p>Auto-start is on. Scan Now checks your watchlist and finds new trades together.</p>
 
       <label>Mode</label>
       <select id="mode">
@@ -367,6 +383,13 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
 
       <label>Watchlist</label>
       <textarea id="symbols">SPY,QQQ,NVDA,TSLA,AAPL,MSFT,META,AMD,PLTR,COST,LLY,UNH,JPM,AVGO</textarea>
+
+      <label>Discovery scan size</label>
+      <select id="scanLimit">
+        <option value="60">Fast: 60 extra tickers</option>
+        <option value="100" selected>Balanced: 100 extra tickers</option>
+        <option value="140">Wide: 140 extra tickers</option>
+      </select>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
         <div>
@@ -378,8 +401,6 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
           <input id="risk" type="number" value="100">
         </div>
       </div>
-
-      <button id="scanBtn" class="primary" type="button">Scan Now</button>
     </div>
 
     <div class="card">
@@ -406,12 +427,9 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
     </div>
 
     <div class="card">
-      <h2>Timers</h2>
+      <h2>Market Timer</h2>
       <p>US market: <b id="marketState">Checking...</b></p>
       <p>Open/close: <b id="marketCountdown">Checking...</b></p>
-      <p>Next scan: <b id="nextScan">Checking...</b></p>
-      <p>Last scan: <b id="lastScan">Not yet</b></p>
-      <p>Keepalive: <b id="keepalive">Starting...</b></p>
     </div>
 
     <div class="card">
@@ -424,29 +442,6 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
       <div id="autoDecisionBox" class="note">
         Waiting for scan. This will show why the paper trader entered or did not enter.
       </div>
-    </div>
-
-    <div class="card">
-      <h2>Manual Paper Trade</h2>
-      <div class="paper-row">
-        <div>
-          <label>Symbol</label>
-          <input id="paperSymbol" placeholder="NVDA">
-        </div>
-        <div>
-          <label>Entry</label>
-          <input id="paperEntry" type="number" step="0.01">
-        </div>
-        <div>
-          <label>Shares</label>
-          <input id="paperShares" type="number" step="0.0001">
-        </div>
-        <button id="addPaperBtn" type="button">Add</button>
-      </div>
-
-      <button id="scanPaperBtn" type="button">Scan Paper Trades</button>
-      <button id="exportLogBtn" type="button">Export Log</button>
-      <button id="clearClosedBtn" type="button">Clear Closed Log</button>
     </div>
 
     <div class="card">
@@ -484,31 +479,22 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
       <div class="kpi"><span>Open Paper</span><strong id="paperCount">0</strong></div>
     </section>
 
-    <section class="kpis">
-      <div class="kpi"><span>Cash</span><strong id="cashKpi">$5,000.00</strong></div>
-      <div class="kpi"><span>Open Value</span><strong id="openValueKpi">$0.00</strong></div>
-      <div class="kpi"><span>Realised P/L</span><strong id="realisedKpi">$0.00</strong></div>
-      <div class="kpi"><span>Unrealised P/L</span><strong id="unrealisedKpi">$0.00</strong></div>
-      <div class="kpi"><span>Win Rate</span><strong id="winRateKpi">0%</strong></div>
-      <div class="kpi"><span>Trades Closed</span><strong id="closedCountKpi">0</strong></div>
-    </section>
-
     <div class="card">
       <h2>Ranked Signals</h2>
-      <p>Best choices stay at the top. Weak or pointless tickers are filtered out.</p>
+      <p>Auto-scan checks your watchlist and a larger discovery universe so you do not only rely on the list.</p>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
               <th>Symbol</th>
               <th>Decision</th>
-              <th>Score</th>
+              <th>Entry Score</th>
+              <th>Strength</th>
               <th>Price</th>
               <th>Buy Zone</th>
               <th>Stop</th>
               <th>Target</th>
               <th>R/R</th>
-              <th>Hold</th>
               <th>Reason</th>
             </tr>
           </thead>
@@ -535,9 +521,41 @@ tbody tr:hover,tbody tr.selected{background:rgba(0,255,136,.1)}
     </div>
 
     <div class="card">
-      <h2>Candlestick Chart</h2>
-      <p id="chartInfo">Timeframe: backend candle data, usually daily candles.</p>
+      <h2>Clear Candlestick Chart</h2>
+      <p id="chartInfo">Timeframe: 1Y daily candles. Green candles are up days, red candles are down days. Buy zone, stop and target are marked clearly.</p>
       <canvas id="chart"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>$5,000 Paper Account</h2>
+      <div class="paper-wide">
+        <div class="level"><span>Cash</span><strong id="cashKpi">$5,000.00</strong></div>
+        <div class="level"><span>Open Value</span><strong id="openValueKpi">$0.00</strong></div>
+        <div class="level"><span>Realised P/L</span><strong id="realisedKpi">$0.00</strong></div>
+        <div class="level"><span>Unrealised P/L</span><strong id="unrealisedKpi">$0.00</strong></div>
+        <div class="level"><span>Win Rate</span><strong id="winRateKpi">0%</strong></div>
+        <div class="level"><span>Closed Trades</span><strong id="closedCountKpi">0</strong></div>
+      </div>
+
+      <div class="paper-row">
+        <div>
+          <label>Manual Symbol</label>
+          <input id="paperSymbol" placeholder="NVDA">
+        </div>
+        <div>
+          <label>Manual Entry</label>
+          <input id="paperEntry" type="number" step="0.01">
+        </div>
+        <div>
+          <label>Shares</label>
+          <input id="paperShares" type="number" step="0.0001">
+        </div>
+        <button id="addPaperBtn" type="button">Add Manual</button>
+      </div>
+
+      <button id="scanPaperBtn" class="small" type="button">Scan Paper Trades</button>
+      <button id="exportLogBtn" class="small" type="button">Export Log</button>
+      <button id="clearClosedBtn" class="small" type="button">Clear Closed Log</button>
     </div>
 
     <div class="card">
@@ -621,27 +639,27 @@ function log(message) {
   }
 }
 
+function setDots(kind) {
+  ["statusDot", "sideStatusDot"].forEach(function(id) {
+    var d = el(id);
+    if (d) {
+      d.className = "dot";
+      if (kind === "good") d.className = "dot green";
+      if (kind === "work") d.className = "dot yellow";
+    }
+  });
+}
+
 function status(message, kind) {
   setText("status", message);
+  setText("sideStatus", message);
   setText("connection", kind === "good" ? "Connected" : kind === "work" ? "Working" : "Offline");
-
-  var d = el("statusDot");
-  if (d) {
-    d.className = "dot";
-    if (kind === "good") {
-      d.className = "dot green";
-    }
-    if (kind === "work") {
-      d.className = "dot yellow";
-    }
-  }
+  setDots(kind);
 }
 
 function showAlert(title, message, type) {
   var box = el("alertBox");
-  if (!box) {
-    return;
-  }
+  if (!box) return;
 
   clearTimeout(ALERT_TIMER);
   box.className = "alert " + (type || "");
@@ -655,15 +673,10 @@ function showAlert(title, message, type) {
 
 function speak(message) {
   try {
-    if (MUTED || !VOICE_UNLOCKED) {
-      return;
-    }
-
+    if (MUTED || !VOICE_UNLOCKED) return;
     window.speechSynthesis.cancel();
-
     var v = new SpeechSynthesisUtterance(message);
     v.rate = 0.95;
-
     window.speechSynthesis.speak(v);
   } catch (error) {
     log("SPEAK ERROR: " + error.message);
@@ -684,7 +697,6 @@ function apiJson(path) {
   }).then(function (response) {
     return response.text().then(function (text) {
       var data = {};
-
       try {
         data = text ? JSON.parse(text) : {};
       } catch (e) {
@@ -702,18 +714,12 @@ function apiJson(path) {
 
 function getSymbols() {
   var box = el("symbols");
-  if (!box) {
-    return "";
-  }
+  if (!box) return "";
 
   return box.value
     .split(",")
-    .map(function (s) {
-      return s.trim().toUpperCase();
-    })
-    .filter(function (s) {
-      return s.length > 0;
-    })
+    .map(function (s) { return s.trim().toUpperCase(); })
+    .filter(function (s) { return s.length > 0; })
     .join(",");
 }
 
@@ -723,7 +729,6 @@ function field(item, names) {
       return item[names[i]];
     }
   }
-
   return null;
 }
 
@@ -733,6 +738,8 @@ function clean(item) {
     symbol: item.symbol || "-",
     decision: field(item, ["decision", "tradeDecision", "action"]) || "WATCH",
     score: item.score !== undefined ? item.score : "-",
+    strengthScore: item.strengthScore !== undefined ? item.strengthScore : item.score,
+    entryScore: item.entryScore !== undefined ? item.entryScore : item.score,
     rank: item.rankScore !== undefined ? item.rankScore : item.score,
     price: field(item, ["price", "currentPrice"]),
     buyLow: field(item, ["buyZoneLow", "buyLow"]),
@@ -763,9 +770,7 @@ function defaultAccount() {
 function getAccount() {
   try {
     var account = JSON.parse(localStorage.getItem("paperAccount") || "null");
-    if (!account || typeof account !== "object") {
-      return defaultAccount();
-    }
+    if (!account || typeof account !== "object") return defaultAccount();
     if (!account.open) account.open = {};
     if (!Array.isArray(account.closed)) account.closed = [];
     if (!Number.isFinite(Number(account.starting))) account.starting = 5000;
@@ -780,19 +785,6 @@ function saveAccount(account) {
   localStorage.setItem("paperAccount", JSON.stringify(account));
 }
 
-function getEquity(account) {
-  var open = account.open || {};
-  var value = 0;
-
-  Object.keys(open).forEach(function (sym) {
-    var p = open[sym];
-    var now = Number(p.lastPrice || p.entry || 0);
-    value += Number(p.shares || 0) * now;
-  });
-
-  return Number(account.cash || 0) + value;
-}
-
 function getOpenValue(account) {
   var open = account.open || {};
   var value = 0;
@@ -804,6 +796,10 @@ function getOpenValue(account) {
   });
 
   return value;
+}
+
+function getEquity(account) {
+  return Number(account.cash || 0) + getOpenValue(account);
 }
 
 function getUnrealised(account) {
@@ -845,9 +841,7 @@ function renderAccount() {
 
 function resetAccount() {
   var size = Number(el("accountSize") ? el("accountSize").value : 5000);
-  if (!Number.isFinite(size) || size < 100) {
-    size = 5000;
-  }
+  if (!Number.isFinite(size) || size < 100) size = 5000;
 
   var account = {
     starting: size,
@@ -868,6 +862,7 @@ function selfCheck() {
   apiJson("/api/health")
     .then(function (data) {
       status("Connected. Auto scanner active.", "good");
+      setText("discoveryText", "expanded universe: " + (data.discoveryCount || "?") + " tickers");
       log("HEALTH OK version " + (data.version || "?"));
     })
     .catch(function (error) {
@@ -883,12 +878,8 @@ function keepAlive() {
     })
     .catch(function () {
       apiJson("/api/health")
-        .then(function () {
-          setText("keepalive", "OK");
-        })
-        .catch(function () {
-          setText("keepalive", "failed");
-        });
+        .then(function () { setText("keepalive", "OK"); })
+        .catch(function () { setText("keepalive", "failed"); });
     });
 }
 
@@ -898,14 +889,15 @@ function scan() {
     return;
   }
 
-  status("Scanning watchlist and finding new trades...", "work");
+  status("Scanning watchlist and expanded discovery universe...", "work");
 
   var risk = el("risk") ? el("risk").value : "100";
   var mode = el("mode") ? el("mode").value : "swing";
   var symbols = getSymbols();
+  var scanLimit = el("scanLimit") ? el("scanLimit").value : "100";
 
   var scanUrl = "/api/scan?mode=" + encodeURIComponent(mode) + "&symbols=" + encodeURIComponent(symbols) + "&risk=" + encodeURIComponent(risk || "100");
-  var discoverUrl = "/api/discover?risk=" + encodeURIComponent(risk || "100") + "&limit=12&exclude=" + encodeURIComponent(symbols);
+  var discoverUrl = "/api/discover?risk=" + encodeURIComponent(risk || "100") + "&limit=20&scanLimit=" + encodeURIComponent(scanLimit) + "&exclude=" + encodeURIComponent(symbols);
 
   Promise.allSettled([
     apiJson(scanUrl),
@@ -928,8 +920,11 @@ function scan() {
         var discoverData = results[1].value;
         var discoverList = discoverData.signals || discoverData.results || discoverData.data || [];
         allSignals = allSignals.concat(discoverList);
+        if (discoverData.discoveryScanned) {
+          setText("discoveryText", "scanned " + discoverData.discoveryScanned + " of " + discoverData.discoveryUniverse + " tickers");
+        }
       } else {
-        errors.push("New trade scan failed: " + results[1].reason.message);
+        errors.push("Discovery scan failed: " + results[1].reason.message);
       }
 
       var seen = {};
@@ -937,18 +932,13 @@ function scan() {
 
       allSignals.forEach(function (item) {
         var r = clean(item);
-
-        if (!r.symbol || r.symbol === "-") {
-          return;
-        }
+        if (!r.symbol || r.symbol === "-") return;
 
         if (seen[r.symbol]) {
           var existing = seen[r.symbol];
-
           if (Number(r.rank || r.score || 0) > Number(existing.rank || existing.score || 0)) {
             seen[r.symbol] = r;
           }
-
           return;
         }
 
@@ -969,10 +959,12 @@ function scan() {
 
       renderRows();
 
-      setText("updated", new Date().toLocaleTimeString());
+      var t = new Date().toLocaleTimeString();
+      setText("updated", t);
+      setText("lastScan", t);
+      setText("sideLastScan", t);
       setText("signalCount", RESULTS.length);
       setText("topSignal", RESULTS[0] ? RESULTS[0].symbol : "-");
-      setText("lastScan", new Date().toLocaleTimeString());
 
       if (errors.length) {
         status("Scan finished with warning. " + RESULTS.length + " results.", "good");
@@ -981,7 +973,7 @@ function scan() {
         status("Scan complete. " + RESULTS.length + " results.", "good");
       }
 
-      log("SCAN OK. Watchlist plus new trades. Results: " + RESULTS.length);
+      log("SCAN OK. Watchlist plus expanded discovery. Results: " + RESULTS.length);
 
       if (RESULTS.length) {
         selectTrade(0, false);
@@ -1002,9 +994,7 @@ function scan() {
 
 function renderRows() {
   var tbody = el("rows");
-  if (!tbody) {
-    return;
-  }
+  if (!tbody) return;
 
   if (!RESULTS.length) {
     tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:20px;color:#9fe9ba">No results returned.</td></tr>';
@@ -1023,13 +1013,13 @@ function renderRows() {
     return '<tr data-index="' + i + '">' +
       '<td><b>' + escapeHtml(r.symbol) + '</b></td>' +
       '<td><span class="' + cls + '">' + escapeHtml(String(r.decision).replace(/_/g, " ")) + '</span></td>' +
-      '<td>' + escapeHtml(r.score) + '</td>' +
+      '<td>' + escapeHtml(r.entryScore || r.score) + '</td>' +
+      '<td>' + escapeHtml(r.strengthScore || "-") + '</td>' +
       '<td>' + money(r.price) + '</td>' +
       '<td>' + money(r.buyLow) + ' to ' + money(r.buyHigh) + '</td>' +
       '<td>' + money(r.stop) + '</td>' +
       '<td>' + money(r.target) + '</td>' +
       '<td>' + escapeHtml(r.rr) + '</td>' +
-      '<td>' + escapeHtml(r.hold) + '</td>' +
       '<td>' + escapeHtml(r.summary) + '</td>' +
       '</tr>';
   }).join("");
@@ -1045,9 +1035,7 @@ function renderRows() {
 
 function selectTrade(index, speakIt) {
   var r = RESULTS[index];
-  if (!r) {
-    return;
-  }
+  if (!r) return;
 
   SELECTED = r;
 
@@ -1057,9 +1045,7 @@ function selectTrade(index, speakIt) {
   });
 
   var active = document.querySelector('#rows tr[data-index="' + index + '"]');
-  if (active) {
-    active.classList.add("selected");
-  }
+  if (active) active.classList.add("selected");
 
   setText("selectedName", r.symbol);
   setText("dPrice", money(r.price));
@@ -1068,19 +1054,16 @@ function selectTrade(index, speakIt) {
   setText("dTarget", money(r.target));
 
   var reasons = r.reasons.length
-    ? r.reasons.map(function (x) {
-        return "- " + escapeHtml(x);
-      }).join("<br>")
+    ? r.reasons.map(function (x) { return "- " + escapeHtml(x); }).join("<br>")
     : "No detailed reasons returned.";
 
   var warns = r.warnings.length
-    ? r.warnings.map(function (x) {
-        return "- " + escapeHtml(x);
-      }).join("<br>")
+    ? r.warnings.map(function (x) { return "- " + escapeHtml(x); }).join("<br>")
     : "No major warnings returned.";
 
   el("details").innerHTML =
     "<h2>" + escapeHtml(r.symbol) + " - " + escapeHtml(String(r.decision).replace(/_/g, " ")) + "</h2>" +
+    "<p><b>Entry score:</b> " + escapeHtml(r.entryScore || r.score) + " | <b>Strength score:</b> " + escapeHtml(r.strengthScore || "-") + "</p>" +
     "<p><b>Action:</b> " + escapeHtml(r.plan) + "</p>" +
     "<p><b>Reason:</b> " + escapeHtml(r.summary) + "</p>" +
     "<p><b>Details:</b><br>" + reasons + "</p>";
@@ -1089,27 +1072,26 @@ function selectTrade(index, speakIt) {
 
   el("education").innerHTML =
     "<b>Why it ranked:</b><br>" + reasons +
+    "<br><br><b>Entry score vs strength score:</b> Strength says how good the stock looks. Entry score says whether it is safe to enter now." +
     "<br><br><b>Entry rule:</b> Auto paper only enters if the backend says ENTER_NOW, score is strong, risk/reward is acceptable, there is enough cash, and the ticker is not already open." +
     "<br><br><b>Exit rule:</b> Auto paper exits if price hits stop, reaches target, the signal becomes AVOID/EXIT/SELL/TRIM, or the score drops below the safety level.";
 
   drawCandlestickChart(r);
 
   if (speakIt) {
-    speak(r.symbol + " selected. Decision " + String(r.decision).replace(/_/g, " ") + ". Score " + r.score + ". Stop " + money(r.stop) + ". Target " + money(r.target) + ".");
+    speak(r.symbol + " selected. Decision " + String(r.decision).replace(/_/g, " ") + ". Entry score " + (r.entryScore || r.score) + ". Strength score " + (r.strengthScore || "unknown") + ".");
   }
 }
 
 function drawCandlestickChart(r) {
   var canvas = el("chart");
-  if (!canvas) {
-    return;
-  }
+  if (!canvas) return;
 
   var rect = canvas.getBoundingClientRect();
   var dpr = window.devicePixelRatio || 1;
 
-  canvas.width = Math.max(700, Math.floor(rect.width * dpr));
-  canvas.height = Math.max(360, Math.floor(rect.height * dpr));
+  canvas.width = Math.max(900, Math.floor(rect.width * dpr));
+  canvas.height = Math.max(440, Math.floor(rect.height * dpr));
 
   var ctx = canvas.getContext("2d");
   var w = canvas.width;
@@ -1129,20 +1111,18 @@ function drawCandlestickChart(r) {
     };
   }).filter(function (b) {
     return Number.isFinite(b.close) && Number.isFinite(b.high) && Number.isFinite(b.low);
-  }).slice(-120);
+  }).slice(-90);
 
   if (!bars.length) {
     ctx.fillStyle = "#7dffa8";
-    ctx.font = (18 * dpr) + "px Arial";
+    ctx.font = (20 * dpr) + "px Arial";
     ctx.fillText("No candle data returned for this symbol.", 24 * dpr, 42 * dpr);
-    ctx.fillText("Scanner values still work, but the chart needs backend bars.", 24 * dpr, 74 * dpr);
+    ctx.fillText("Scanner values still work, but the chart needs backend bars.", 24 * dpr, 78 * dpr);
     return;
   }
 
   bars.forEach(function (b) {
-    if (!Number.isFinite(b.open)) {
-      b.open = b.close;
-    }
+    if (!Number.isFinite(b.open)) b.open = b.close;
   });
 
   var levels = [r.price, r.buyLow, r.buyHigh, r.stop, r.target].map(num).filter(function (v) {
@@ -1157,21 +1137,18 @@ function drawCandlestickChart(r) {
     vals.push(v);
   });
 
-  var min = Math.min.apply(null, vals) * 0.995;
-  var max = Math.max.apply(null, vals) * 1.005;
+  var min = Math.min.apply(null, vals) * 0.992;
+  var max = Math.max.apply(null, vals) * 1.008;
+  if (max <= min) max = min + 1;
 
-  if (max <= min) {
-    max = min + 1;
-  }
-
-  var left = 58 * dpr;
-  var right = 160 * dpr;
-  var top = 22 * dpr;
-  var bottom = 40 * dpr;
+  var left = 70 * dpr;
+  var right = 190 * dpr;
+  var top = 34 * dpr;
+  var bottom = 52 * dpr;
   var cw = w - left - right;
   var ch = h - top - bottom;
   var step = cw / Math.max(1, bars.length);
-  var bodyW = Math.max(3 * dpr, step * 0.62);
+  var bodyW = Math.max(5 * dpr, Math.min(14 * dpr, step * 0.7));
 
   function xFor(i) {
     return left + step * i + step / 2;
@@ -1181,22 +1158,30 @@ function drawCandlestickChart(r) {
     return top + ch - ((v - min) / (max - min)) * ch;
   }
 
-  ctx.strokeStyle = "rgba(0,255,136,.10)";
+  ctx.strokeStyle = "rgba(0,255,136,.12)";
   ctx.lineWidth = dpr;
+  ctx.fillStyle = "#9fe9ba";
+  ctx.font = (11 * dpr) + "px Arial";
 
   for (var g = 0; g <= 6; g++) {
     var gy = top + ch * g / 6;
+    var priceLabel = max - (max - min) * g / 6;
     ctx.beginPath();
     ctx.moveTo(left, gy);
     ctx.lineTo(w - right, gy);
     ctx.stroke();
+    ctx.fillText("$" + priceLabel.toFixed(2), 8 * dpr, gy + 4 * dpr);
   }
 
   if (Number.isFinite(num(r.buyLow)) && Number.isFinite(num(r.buyHigh))) {
     var y1 = yFor(Math.max(num(r.buyLow), num(r.buyHigh)));
     var y2 = yFor(Math.min(num(r.buyLow), num(r.buyHigh)));
-    ctx.fillStyle = "rgba(0,255,136,.08)";
-    ctx.fillRect(left, y1, cw, Math.max(2 * dpr, y2 - y1));
+    ctx.fillStyle = "rgba(0,255,136,.10)";
+    ctx.fillRect(left, y1, cw, Math.max(4 * dpr, y2 - y1));
+
+    ctx.fillStyle = "rgba(0,255,136,.45)";
+    ctx.font = "bold " + (12 * dpr) + "px Arial";
+    ctx.fillText("BUY ZONE", left + 10 * dpr, y1 + 18 * dpr);
   }
 
   bars.forEach(function (b, i) {
@@ -1208,10 +1193,10 @@ function drawCandlestickChart(r) {
     var bullish = b.close >= b.open;
     var color = bullish ? "#00ff88" : "#ff5577";
     var topBody = Math.min(yOpen, yClose);
-    var bodyH = Math.max(1.5 * dpr, Math.abs(yOpen - yClose));
+    var bodyH = Math.max(2 * dpr, Math.abs(yOpen - yClose));
 
     ctx.strokeStyle = color;
-    ctx.lineWidth = 1.2 * dpr;
+    ctx.lineWidth = 1.5 * dpr;
     ctx.beginPath();
     ctx.moveTo(x, yHigh);
     ctx.lineTo(x, yLow);
@@ -1221,16 +1206,15 @@ function drawCandlestickChart(r) {
     ctx.fillRect(x - bodyW / 2, topBody, bodyW, bodyH);
   });
 
-  function line(v, c, label) {
+  function levelLine(v, c, label, dash) {
     v = num(v);
-    if (!Number.isFinite(v)) {
-      return;
-    }
+    if (!Number.isFinite(v)) return;
 
     var y = yFor(v);
 
     ctx.strokeStyle = c;
-    ctx.setLineDash([6 * dpr, 5 * dpr]);
+    ctx.lineWidth = 2 * dpr;
+    if (dash) ctx.setLineDash([8 * dpr, 6 * dpr]);
     ctx.beginPath();
     ctx.moveTo(left, y);
     ctx.lineTo(w - right, y);
@@ -1238,43 +1222,40 @@ function drawCandlestickChart(r) {
     ctx.setLineDash([]);
 
     ctx.fillStyle = c;
-    ctx.font = "bold " + (12 * dpr) + "px Arial";
-    ctx.fillText(label + " " + money(v), w - right + 8 * dpr, y + 4 * dpr);
+    ctx.font = "bold " + (13 * dpr) + "px Arial";
+    ctx.fillText(label, w - right + 10 * dpr, y - 4 * dpr);
+    ctx.fillText(money(v), w - right + 10 * dpr, y + 13 * dpr);
   }
 
-  line(r.price, "#fff", "Current");
-  line(r.buyLow, "#7dffa8", "Buy low");
-  line(r.buyHigh, "#7dffa8", "Buy high");
-  line(r.stop, "#ff5577", "Stop");
-  line(r.target, "#ffd166", "Target");
+  levelLine(r.price, "#ffffff", "CURRENT", true);
+  levelLine(r.buyLow, "#7dffa8", "BUY LOW", true);
+  levelLine(r.buyHigh, "#7dffa8", "BUY HIGH", true);
+  levelLine(r.stop, "#ff5577", "STOP", true);
+  levelLine(r.target, "#ffd166", "TARGET", true);
 
-  ctx.fillStyle = "rgba(125,255,168,.24)";
-  ctx.font = "bold " + (34 * dpr) + "px Arial";
-  ctx.fillText(r.symbol, left + 14 * dpr, top + 38 * dpr);
+  ctx.fillStyle = "rgba(125,255,168,.25)";
+  ctx.font = "bold " + (38 * dpr) + "px Arial";
+  ctx.fillText(r.symbol, left + 14 * dpr, top + 40 * dpr);
 
   ctx.fillStyle = "#9fe9ba";
-  ctx.font = (12 * dpr) + "px Arial";
-  ctx.fillText("Timeframe: backend candle data, usually daily candles.", left, h - 14 * dpr);
+  ctx.font = (13 * dpr) + "px Arial";
+  ctx.fillText("90 daily candles. Candle chart with buy zone, stop, target and current price.", left, h - 18 * dpr);
 }
 
 function marketClock() {
   var now = new Date();
   var ny = new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }));
   var day = ny.getDay();
-
   var open = new Date(ny);
   var close = new Date(ny);
-
   open.setHours(9, 30, 0, 0);
   close.setHours(16, 0, 0, 0);
 
   function fmt(ms) {
     ms = Math.max(0, ms);
-
     var h = Math.floor(ms / 3600000);
     var m = Math.floor((ms % 3600000) / 60000);
     var s = Math.floor((ms % 60000) / 1000);
-
     return h + "h " + pad(m) + "m " + pad(s) + "s";
   }
 
@@ -1282,11 +1263,9 @@ function marketClock() {
     var n = new Date(d);
     n.setDate(n.getDate() + 1);
     n.setHours(9, 30, 0, 0);
-
     while (n.getDay() === 0 || n.getDay() === 6) {
       n.setDate(n.getDate() + 1);
     }
-
     return n;
   }
 
@@ -1295,13 +1274,8 @@ function marketClock() {
     return { state: "Closed", countdown: "opens in " + fmt(w - ny) };
   }
 
-  if (ny < open) {
-    return { state: "Pre-market", countdown: "opens in " + fmt(open - ny) };
-  }
-
-  if (ny >= open && ny < close) {
-    return { state: "Open", countdown: "closes in " + fmt(close - ny) };
-  }
+  if (ny < open) return { state: "Pre-market", countdown: "opens in " + fmt(open - ny) };
+  if (ny >= open && ny < close) return { state: "Open", countdown: "closes in " + fmt(close - ny) };
 
   var n = nextOpen(ny);
   return { state: "After-hours", countdown: "opens in " + fmt(n - ny) };
@@ -1309,19 +1283,16 @@ function marketClock() {
 
 function updateTimers() {
   var mc = marketClock();
-
   setText("marketState", mc.state);
   setText("marketCountdown", mc.countdown);
 
   if (SCANNER_RUNNING && NEXT_SCAN) {
     var ms = NEXT_SCAN - Date.now();
-    if (ms < 0) {
-      ms = 0;
-    }
-
-    setText("nextScan", Math.floor(ms / 60000) + ":" + pad(Math.floor((ms % 60000) / 1000)));
+    if (ms < 0) ms = 0;
+    var text = Math.floor(ms / 60000) + ":" + pad(Math.floor((ms % 60000) / 1000));
+    setText("sideNextScan", text);
   } else {
-    setText("nextScan", "Paused");
+    setText("sideNextScan", "Paused");
   }
 }
 
@@ -1338,16 +1309,10 @@ function scheduleLoop() {
   }
 
   var minutes = Number(el("refresh") ? el("refresh").value : 5);
-  if (!Number.isFinite(minutes) || minutes < 1) {
-    minutes = 5;
-  }
+  if (!Number.isFinite(minutes) || minutes < 1) minutes = 5;
 
   NEXT_SCAN = Date.now() + minutes * 60000;
-
-  LOOP = setTimeout(function () {
-    scan();
-  }, minutes * 60000);
-
+  LOOP = setTimeout(function () { scan(); }, minutes * 60000);
   updateTimers();
 }
 
@@ -1360,10 +1325,8 @@ function toggleScanner() {
     status("Scanner resumed.", "good");
     scan();
   } else {
-    if (LOOP) {
-      clearTimeout(LOOP);
-      LOOP = null;
-    }
+    if (LOOP) clearTimeout(LOOP);
+    LOOP = null;
     NEXT_SCAN = 0;
     status("Scanner paused.", "bad");
     updateTimers();
@@ -1372,9 +1335,7 @@ function toggleScanner() {
 
 function updateRunButtons() {
   var btn = el("pauseBtn");
-  if (btn) {
-    btn.textContent = SCANNER_RUNNING ? "Pause" : "Resume";
-  }
+  if (btn) btn.textContent = SCANNER_RUNNING ? "Pause" : "Resume";
 }
 
 function toggleMute() {
@@ -1407,11 +1368,8 @@ function toggleAutoPaper() {
 function updateAutoState() {
   setText("autoState", AUTO_PAPER ? "On" : "Off");
   setText("topAuto", AUTO_PAPER ? "On" : "Off");
-
   var btn = el("autoBtn");
-  if (btn) {
-    btn.textContent = AUTO_PAPER ? "Turn Auto Paper Off" : "Turn Auto Paper On";
-  }
+  if (btn) btn.textContent = AUTO_PAPER ? "Turn Auto Paper Off" : "Turn Auto Paper On";
 }
 
 function updateAutoRules() {
@@ -1420,11 +1378,8 @@ function updateAutoRules() {
   var maxPct = el("maxTradePct") ? el("maxTradePct").value : "20";
   var maxOpen = el("maxOpenTrades") ? el("maxOpenTrades").value : "5";
   var accountSize = el("accountSize") ? el("accountSize").value : "5000";
-
   var box = el("autoRulesBox");
-  if (!box) {
-    return;
-  }
+  if (!box) return;
 
   box.innerHTML =
     "<b>Paper account</b><br>" +
@@ -1434,7 +1389,7 @@ function updateAutoRules() {
     "<b>Entry rules</b><br>" +
     "1. Auto paper must be ON.<br>" +
     "2. Scanner decision must be ENTER_NOW.<br>" +
-    "3. Score must be at least " + escapeHtml(minScore) + ".<br>" +
+    "3. Entry score must be at least " + escapeHtml(minScore) + ".<br>" +
     "4. Risk/reward must be at least " + escapeHtml(minRR) + ".<br>" +
     "5. Cash must be available.<br>" +
     "6. Ticker must not already be open.<br><br>" +
@@ -1442,16 +1397,12 @@ function updateAutoRules() {
     "1. Exit if price hits stop.<br>" +
     "2. Exit if price hits target.<br>" +
     "3. Exit if scanner changes to AVOID, EXIT, SELL, or TRIM.<br>" +
-    "4. Exit if score falls below 55.<br><br>" +
-    "<b>Keep running</b><br>" +
-    "The scanner keeps running while the page stays open and the computer stays awake.";
+    "4. Exit if entry score falls below 55.";
 }
 
 function setAutoDecision(html) {
   var box = el("autoDecisionBox");
-  if (box) {
-    box.innerHTML = html;
-  }
+  if (box) box.innerHTML = html;
 }
 
 function autoRejectReason(r, account) {
@@ -1470,7 +1421,7 @@ function autoRejectReason(r, account) {
   } else if (!/ENTER_NOW/i.test(String(r.decision))) {
     lines.push("Reason: scanner says " + escapeHtml(String(r.decision).replace(/_/g, " ")) + ", not ENTER_NOW.");
   } else if (Number(r.score) < minScore) {
-    lines.push("Reason: score " + escapeHtml(r.score) + " is below minimum " + escapeHtml(minScore) + ".");
+    lines.push("Reason: entry score " + escapeHtml(r.score) + " is below minimum " + escapeHtml(minScore) + ".");
   } else if (Number(r.rr) < minRR) {
     lines.push("Reason: risk/reward " + escapeHtml(r.rr) + " is below minimum " + escapeHtml(minRR) + ".");
   } else if (!Number.isFinite(Number(r.price)) || !Number.isFinite(Number(r.stop)) || !Number.isFinite(Number(r.target))) {
@@ -1481,7 +1432,8 @@ function autoRejectReason(r, account) {
     lines.push("Reason: passed close review, but no auto action was taken.");
   }
 
-  lines.push("Score: " + escapeHtml(r.score));
+  lines.push("Entry score: " + escapeHtml(r.score));
+  lines.push("Strength score: " + escapeHtml(r.strengthScore || "-"));
   lines.push("Decision: " + escapeHtml(String(r.decision).replace(/_/g, " ")));
   lines.push("R/R: " + escapeHtml(r.rr));
   lines.push("Price: " + money(r.price));
@@ -1518,21 +1470,10 @@ function shouldAutoExit(position, r) {
   var score = r ? Number(r.score) : Number(position.entryScore || 0);
   var decision = r ? String(r.decision) : "";
 
-  if (Number.isFinite(stop) && price <= stop) {
-    return "Stop hit";
-  }
-
-  if (Number.isFinite(target) && price >= target) {
-    return "Target hit";
-  }
-
-  if (/AVOID|EXIT|SELL|TRIM/i.test(decision)) {
-    return "Scanner changed to " + decision.replace(/_/g, " ");
-  }
-
-  if (Number.isFinite(score) && score < 55) {
-    return "Score breakdown below 55";
-  }
+  if (Number.isFinite(stop) && price <= stop) return "Stop hit";
+  if (Number.isFinite(target) && price >= target) return "Target hit";
+  if (/AVOID|EXIT|SELL|TRIM/i.test(decision)) return "Scanner changed to " + decision.replace(/_/g, " ");
+  if (Number.isFinite(score) && score < 55) return "Entry score breakdown below 55";
 
   return "";
 }
@@ -1615,7 +1556,7 @@ function autoPaperCheck() {
           "<b>" + escapeHtml(r.symbol) + " already open</b><br>" +
           "Still holding. No exit rule triggered.<br>" +
           "Current decision: " + escapeHtml(String(r.decision).replace(/_/g, " ")) + "<br>" +
-          "Score: " + escapeHtml(r.score)
+          "Entry score: " + escapeHtml(r.score)
         );
       }
 
@@ -1651,6 +1592,7 @@ function autoPaperCheck() {
         target: Number(r.target),
         target2: Number(r.target2 || r.target),
         entryScore: Number(r.score),
+        strengthScore: Number(r.strengthScore || r.score),
         entryDecision: r.decision,
         entryTime: nowText(),
         entryReason: r.summary,
@@ -1671,7 +1613,8 @@ function autoPaperCheck() {
         "Cost: " + money(cost) + "<br>" +
         "Stop: " + money(r.stop) + "<br>" +
         "Target: " + money(r.target) + "<br>" +
-        "Score: " + escapeHtml(r.score) + "<br>" +
+        "Entry score: " + escapeHtml(r.score) + "<br>" +
+        "Strength score: " + escapeHtml(r.strengthScore || "-") + "<br>" +
         "R/R: " + escapeHtml(r.rr)
       );
 
@@ -1705,9 +1648,7 @@ function addPaper() {
     return;
   }
 
-  if (!Number.isFinite(shares) || shares <= 0) {
-    shares = 1;
-  }
+  if (!Number.isFinite(shares) || shares <= 0) shares = 1;
 
   var account = getAccount();
   var cost = entry * shares;
@@ -1752,14 +1693,9 @@ function addPaper() {
 function closePaper(symbol) {
   var account = getAccount();
   var pos = account.open[symbol];
+  if (!pos) return;
 
-  if (!pos) {
-    return;
-  }
-
-  var r = RESULTS.find(function (x) {
-    return x.symbol === symbol;
-  });
+  var r = RESULTS.find(function (x) { return x.symbol === symbol; });
 
   var exitPrice = r ? Number(r.price) : Number(pos.lastPrice || pos.entry);
   var entryPrice = Number(pos.entry);
@@ -1838,9 +1774,7 @@ function renderPaper() {
     } else {
       box.innerHTML = keys.map(function (sym) {
         var p = open[sym];
-        var r = RESULTS.find(function (x) {
-          return x.symbol === sym;
-        });
+        var r = RESULTS.find(function (x) { return x.symbol === sym; });
 
         if (r) {
           p.lastPrice = Number(r.price);
@@ -1906,6 +1840,7 @@ function exportLog() {
       autoPaper: AUTO_PAPER,
       scannerRunning: SCANNER_RUNNING,
       muted: MUTED,
+      scanLimit: el("scanLimit") ? el("scanLimit").value : "100",
       maxTradePct: el("maxTradePct") ? el("maxTradePct").value : "20",
       maxOpenTrades: el("maxOpenTrades") ? el("maxOpenTrades").value : "5",
       autoMinScore: el("autoMinScore") ? el("autoMinScore").value : "82",
@@ -1935,13 +1870,6 @@ function saveSettings() {
 function start() {
   document.addEventListener("click", unlockVoiceOnce, { once: true });
 
-  el("scanBtn").addEventListener("click", function () {
-    SCANNER_RUNNING = true;
-    saveSettings();
-    updateRunButtons();
-    scan();
-  });
-
   el("pauseBtn").addEventListener("click", toggleScanner);
   el("muteBtn").addEventListener("click", toggleMute);
   el("autoBtn").addEventListener("click", toggleAutoPaper);
@@ -1957,12 +1885,19 @@ function start() {
     "maxTradePct",
     "maxOpenTrades",
     "accountSize",
-    "refresh"
+    "refresh",
+    "scanLimit"
   ].forEach(function (id) {
     if (el(id)) {
       el(id).addEventListener("input", function () {
         updateAutoRules();
         scheduleLoop();
+      });
+      el(id).addEventListener("change", function () {
+        updateAutoRules();
+        if (SCANNER_RUNNING) {
+          scan();
+        }
       });
     }
   });
