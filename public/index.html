@@ -387,6 +387,69 @@ tr.row-watch{background:rgba(156,163,175,.035)}
 .alert.bad{border-color:var(--red)}
 .alert.warn{border-color:var(--yellow)}
 
+.trade-pop-wrap{
+  position:fixed;
+  inset:0;
+  z-index:2000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,.58);
+  padding:18px;
+}
+
+.trade-pop{
+  width:min(620px,96vw);
+  background:#00190d;
+  border:2px solid var(--green);
+  border-radius:18px;
+  padding:18px;
+  box-shadow:0 0 42px rgba(0,255,136,.28);
+}
+
+.trade-pop.bad{
+  border-color:var(--red);
+  box-shadow:0 0 42px rgba(255,85,119,.22);
+}
+
+.trade-pop.warn{
+  border-color:var(--yellow);
+  box-shadow:0 0 42px rgba(255,209,102,.22);
+}
+
+.trade-pop h2{
+  margin:0 0 10px;
+  font-size:22px;
+  color:var(--green2);
+}
+
+.trade-pop.bad h2{color:#ff9aae}
+.trade-pop.warn h2{color:var(--yellow)}
+
+.trade-pop .trade-lines{
+  background:#000;
+  border:1px solid rgba(0,255,136,.2);
+  border-radius:12px;
+  padding:12px;
+  line-height:1.55;
+  font-size:14px;
+}
+
+.trade-pop .trade-lines b{color:#fff}
+
+.trade-pop .trade-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  margin-top:12px;
+}
+
+.trade-pop .countdown{
+  color:var(--muted);
+  font-size:12px;
+  margin-top:8px;
+}
+
 details summary{
   cursor:pointer;
   color:var(--green2);
@@ -444,7 +507,7 @@ details summary{
 
   <div class="card">
     <h2>Best Trades Right Now</h2>
-    <p>These are the highest-ranked trades from the same sorted list below. Best is first, then working down.</p>
+    <p>Highest-ranked trades from the same sorted list below. Best is first, then working down.</p>
     <div id="wakeWarning" class="note wake-warning"></div>
     <div id="bestTrades" class="best-strip">
       <div class="best-card"><strong>-</strong><span>Waiting for scan.</span></div>
@@ -619,6 +682,17 @@ details summary{
 
 <div id="alertBox" class="alert"></div>
 
+<div id="tradePopWrap" class="trade-pop-wrap">
+  <div id="tradePop" class="trade-pop">
+    <h2 id="tradePopTitle">Paper Trade Alert</h2>
+    <div id="tradePopLines" class="trade-lines"></div>
+    <div id="tradePopCountdown" class="countdown">Closing in 10 seconds...</div>
+    <div class="trade-actions">
+      <button id="tradePopClose" type="button">Close</button>
+    </div>
+  </div>
+</div>
+
 <script>
 var API = "";
 var RESULTS = [];
@@ -628,6 +702,9 @@ var NEXT_SCAN = 0;
 var TIMER = null;
 var KEEP_TIMER = null;
 var ALERT_TIMER = null;
+var TRADE_POP_TIMER = null;
+var TRADE_POP_LEFT = 10;
+var TRADE_POP_COUNTDOWN = null;
 var MARKET_HEALTH = "Unknown";
 var LAST_ACTIVE_TIME = Date.now();
 
@@ -643,11 +720,6 @@ function money(value){var n=Number(value);return Number.isFinite(n)?"$"+n.toFixe
 function num(value){var n=Number(value);return Number.isFinite(n)?n:null;}
 function pad(value){value=Number(value);return value<10?"0"+value:String(value);}
 function nowText(){return new Date().toLocaleString();}
-
-function todayKey(){
-  var d = new Date();
-  return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
-}
 
 function parseDateSafe(value){
   var d = new Date(value);
@@ -713,6 +785,70 @@ function showAlert(title,message,type){
   ALERT_TIMER=setTimeout(function(){
     box.style.display="none";
   },10000);
+}
+
+function closeTradePop(){
+  var wrap = el("tradePopWrap");
+
+  if (wrap) {
+    wrap.style.display = "none";
+  }
+
+  if (TRADE_POP_TIMER) {
+    clearTimeout(TRADE_POP_TIMER);
+    TRADE_POP_TIMER = null;
+  }
+
+  if (TRADE_POP_COUNTDOWN) {
+    clearInterval(TRADE_POP_COUNTDOWN);
+    TRADE_POP_COUNTDOWN = null;
+  }
+}
+
+function showTradePop(title, lines, type){
+  var wrap = el("tradePopWrap");
+  var pop = el("tradePop");
+  var titleBox = el("tradePopTitle");
+  var linesBox = el("tradePopLines");
+  var countdownBox = el("tradePopCountdown");
+
+  if (!wrap || !pop || !titleBox || !linesBox) {
+    showAlert(title, lines.join(" | "), type);
+    return;
+  }
+
+  closeTradePop();
+
+  pop.className = "trade-pop " + (type || "");
+  titleBox.textContent = title;
+
+  linesBox.innerHTML = lines.map(function(line){
+    return "<div>" + line + "</div>";
+  }).join("");
+
+  TRADE_POP_LEFT = 10;
+
+  if (countdownBox) {
+    countdownBox.textContent = "Closing in " + TRADE_POP_LEFT + " seconds...";
+  }
+
+  wrap.style.display = "flex";
+
+  TRADE_POP_COUNTDOWN = setInterval(function(){
+    TRADE_POP_LEFT -= 1;
+
+    if (countdownBox) {
+      countdownBox.textContent = "Closing in " + Math.max(0, TRADE_POP_LEFT) + " seconds...";
+    }
+
+    if (TRADE_POP_LEFT <= 0) {
+      closeTradePop();
+    }
+  }, 1000);
+
+  TRADE_POP_TIMER = setTimeout(function(){
+    closeTradePop();
+  }, 10000);
 }
 
 function speak(message){
@@ -1801,8 +1937,22 @@ function autoPaperCheck(){
         delete account.open[r.symbol];
 
         decisionLines.push("<b style='color:#ff5577'>"+escapeHtml(r.symbol)+" paper exit</b><br>Reason: "+escapeHtml(exitReason)+"<br>P/L: "+money(pnl)+" ("+pnlPct.toFixed(2)+"%)");
+
         showAlert("Paper exit",r.symbol+" exited. Reason: "+exitReason,"bad");
-        speak("Paper trade exited. "+r.symbol+". Reason "+exitReason+".");
+
+        showTradePop("Paper Trade Exited", [
+          "<b>Symbol:</b> " + escapeHtml(r.symbol),
+          "<b>Exit price:</b> " + money(exitPrice),
+          "<b>Entry price:</b> " + money(entryPrice),
+          "<b>Shares:</b> " + escapeHtml(shares),
+          "<b>Proceeds:</b> " + money(proceeds),
+          "<b>P/L:</b> " + money(pnl) + " (" + pnlPct.toFixed(2) + "%)",
+          "<b>Exit reason:</b> " + escapeHtml(exitReason),
+          "<b>Entry score:</b> " + escapeHtml(pos.entryScore || "-"),
+          "<b>Exit score:</b> " + escapeHtml(r.score || "-")
+        ], "bad");
+
+        speak("Paper trade exited. "+r.symbol+". Reason "+exitReason+". Profit or loss "+money(pnl)+".");
         addActivity(r.symbol + " exited. Reason: " + exitReason + ". P/L " + money(pnl) + ".");
       }else{
         account.open[r.symbol]=pos;
@@ -1858,8 +2008,23 @@ function autoPaperCheck(){
       };
 
       decisionLines.push("<b style='color:#00ff88'>"+escapeHtml(r.symbol)+" paper entry</b><br>Entry: "+money(price)+"<br>Shares: "+shares+"<br>Cost: "+money(cost)+"<br>Stop: "+money(r.stop)+"<br>Target: "+money(r.target));
+
       showAlert("Paper entry",r.symbol+" entered at "+money(price)+". Shares "+shares,"");
-      speak("Paper trade entered. "+r.symbol+" at "+money(price)+".");
+
+      showTradePop("Paper Trade Entered", [
+        "<b>Symbol:</b> " + escapeHtml(r.symbol),
+        "<b>Entry:</b> " + money(price),
+        "<b>Shares:</b> " + escapeHtml(shares),
+        "<b>Trade cost:</b> " + money(cost),
+        "<b>Stop:</b> " + money(r.stop),
+        "<b>Target:</b> " + money(r.target),
+        "<b>Entry score:</b> " + escapeHtml(r.score),
+        "<b>Strength score:</b> " + escapeHtml(r.strengthScore || "-"),
+        "<b>Reason:</b> ENTER_NOW passed the auto paper rules.",
+        "<b>Plan:</b> Hold as swing trade unless stop, target, or exit rule triggers."
+      ], "");
+
+      speak("Paper trade entered. "+r.symbol+" at "+money(price)+". Shares "+shares+". Stop "+money(r.stop)+". Target "+money(r.target)+".");
       addActivity(r.symbol + " entered. Entry " + money(price) + ", shares " + shares + ", score " + r.score + ".");
       return;
     }
@@ -1971,6 +2136,16 @@ function closePaper(symbol){
   renderAccount();
 
   showAlert("Manual paper close",symbol+" closed at "+money(exitPrice)+". P/L "+money(pnl),pnl>=0?"":"bad");
+
+  showTradePop("Manual Paper Trade Closed", [
+    "<b>Symbol:</b> " + escapeHtml(symbol),
+    "<b>Exit price:</b> " + money(exitPrice),
+    "<b>Entry price:</b> " + money(entryPrice),
+    "<b>Shares:</b> " + escapeHtml(shares),
+    "<b>P/L:</b> " + money(pnl) + " (" + pnlPct.toFixed(2) + "%)",
+    "<b>Reason:</b> Manual close"
+  ], pnl >= 0 ? "" : "bad");
+
   addActivity(symbol + " manually closed. P/L " + money(pnl) + ".");
 }
 
@@ -2116,6 +2291,10 @@ function start(){
   el("scanPaperBtn").addEventListener("click",scanPaper);
   el("clearClosedBtn").addEventListener("click",clearClosedLog);
   el("exportLogBtn").addEventListener("click",exportLog);
+
+  if (el("tradePopClose")) {
+    el("tradePopClose").addEventListener("click", closeTradePop);
+  }
 
   ["autoMinScore","autoMinRR","maxTradePct","maxOpenTrades","maxDailyEntries","accountSize","refresh","scanLimit"].forEach(function(id){
     if(el(id)){
